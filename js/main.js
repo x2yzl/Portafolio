@@ -65,7 +65,55 @@
     });
   }
 
+  var allProjects = [];
+
   function renderProjects(projects) {
+    var grid = document.getElementById('projects-grid');
+    if (!grid) return;
+
+    allProjects = projects || [];
+
+    if (!projects || projects.length === 0) {
+      grid.innerHTML = '<div class="projects__empty">próximamente</div>';
+      return;
+    }
+
+    renderProjectFilters(projects);
+    renderProjectGrid(projects);
+  }
+
+  function renderProjectFilters(projects) {
+    var container = document.getElementById('projects-filters');
+    if (!container) return;
+
+    var tags = {};
+    projects.forEach(function(p) {
+      (p.tags || []).forEach(function(t) { tags[t] = true; });
+    });
+    var allTags = Object.keys(tags).sort();
+
+    var html = '<button class="projects__filter projects__filter--active" data-tag="all">[ all ]</button>';
+    allTags.forEach(function(t) {
+      html += '<button class="projects__filter" data-tag="' + t + '">[ ' + t + ' ]</button>';
+    });
+    container.innerHTML = html;
+
+    container.querySelectorAll('.projects__filter').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        container.querySelectorAll('.projects__filter').forEach(function(b) {
+          b.classList.remove('projects__filter--active');
+        });
+        btn.classList.add('projects__filter--active');
+        var tag = btn.getAttribute('data-tag');
+        var filtered = tag === 'all' ? allProjects : allProjects.filter(function(p) {
+          return (p.tags || []).indexOf(tag) !== -1;
+        });
+        renderProjectGrid(filtered);
+      });
+    });
+  }
+
+  function renderProjectGrid(projects) {
     var grid = document.getElementById('projects-grid');
     if (!grid) return;
 
