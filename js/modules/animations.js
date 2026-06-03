@@ -79,9 +79,13 @@
         trigger: el,
         start: triggerStart || 'top 90%',
         onEnter: function() {
+          if (el._revealed) return;
+          el._revealed = true;
           gsap.fromTo(el, fromVars, toVars);
         },
         onEnterBack: function() {
+          if (el._revealed) return;
+          el._revealed = true;
           gsap.fromTo(el, fromVars, toVars);
         },
       });
@@ -116,17 +120,22 @@
     if (items.length === 0) return;
 
     gsap.set(items, { y: 40, opacity: 0, scale: 0.8 });
+    var done = false;
 
     ScrollTrigger.create({
       trigger: '#skills-grid',
       start: 'top 80%',
       onEnter: function() {
+        if (done) return;
+        done = true;
         gsap.fromTo(items,
           { y: 40, opacity: 0, scale: 0.8 },
           { y: 0, opacity: 1, scale: 1, duration: 0.55, stagger: 0.035, ease: 'back.out(1.7)', immediateRender: false }
         );
       },
       onEnterBack: function() {
+        if (done) return;
+        done = true;
         gsap.fromTo(items,
           { y: 40, opacity: 0, scale: 0.8 },
           { y: 0, opacity: 1, scale: 1, duration: 0.55, stagger: 0.035, ease: 'back.out(1.7)', immediateRender: false }
@@ -140,17 +149,22 @@
     if (cards.length === 0) return;
 
     gsap.set(cards, { y: 50, opacity: 0, scale: 0.92 });
+    var done = false;
 
     ScrollTrigger.create({
       trigger: '#projects-grid',
       start: 'top 82%',
       onEnter: function() {
+        if (done) return;
+        done = true;
         gsap.fromTo(cards,
           { y: 50, opacity: 0, scale: 0.92 },
           { y: 0, opacity: 1, scale: 1, duration: 0.6, stagger: 0.08, ease: 'power3.out', immediateRender: false }
         );
       },
       onEnterBack: function() {
+        if (done) return;
+        done = true;
         gsap.fromTo(cards,
           { y: 50, opacity: 0, scale: 0.92 },
           { y: 0, opacity: 1, scale: 1, duration: 0.6, stagger: 0.08, ease: 'power3.out', immediateRender: false }
@@ -163,13 +177,19 @@
     var countEl = document.getElementById('skills-count');
     if (!countEl) return;
 
+    var done = false;
+
     ScrollTrigger.create({
       trigger: countEl,
       start: 'top 90%',
       onEnter: function() {
+        if (done) return;
+        done = true;
         gsap.from(countEl, { textContent: 0, duration: 1.2, ease: 'power2.out', snap: { textContent: 1 } });
       },
       onEnterBack: function() {
+        if (done) return;
+        done = true;
         gsap.from(countEl, { textContent: 0, duration: 1.2, ease: 'power2.out', snap: { textContent: 1 } });
       },
     });
