@@ -16,19 +16,41 @@
     });
   }
 
+  var SIMPLE_ICONS = {
+    'JavaScript': 'javascript', 'TypeScript': 'typescript', 'React': 'react',
+    'Next.js': 'nextdotjs', 'Vue.js': 'vuedotjs', 'Angular': 'angular',
+    'Svelte': 'svelte', 'Tailwind CSS': 'tailwindcss',
+    'GSAP': 'greensock', 'Three.js': 'threedotjs', 'WebGL': 'webgl',
+    'HTML/CSS': 'html5', 'Node.js': 'nodedotjs', 'Python': 'python',
+    'Go': 'go', 'Rust': 'rust', 'Java': 'java', 'C#': 'csharp',
+    'PostgreSQL': 'postgresql', 'MongoDB': 'mongodb', 'Redis': 'redis',
+    'GraphQL': 'graphql', 'gRPC': 'grpc', 'Kafka': 'apachekafka',
+    'Docker': 'docker', 'Kubernetes': 'kubernetes', 'AWS': 'amazonwebservices',
+    'GCP': 'googlecloud', 'Azure': 'azuredevops', 'CI/CD': '',
+    'Terraform': 'terraform', 'Ansible': 'ansible', 'Git': 'git',
+    'Linux': 'linux', 'Nginx': 'nginx', 'Prometheus': 'prometheus',
+  };
+
+  function skillIcon(name) {
+    var slug = SIMPLE_ICONS[name];
+    return slug ? 'https://cdn.simpleicons.org/' + slug : 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'40\' height=\'40\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%23888\' stroke-width=\'1.5\'%3E%3Ccircle cx=\'12\' cy=\'12\' r=\'10\'/%3E%3Cpath d=\'M12 6v6l4 2\'/%3E%3C/svg%3E';
+  }
+
   function renderSkills(skills) {
     var grid = document.getElementById('skills-grid');
     if (!grid) return;
 
     grid.innerHTML = skills.map(function(s) {
-      var icon = s.icon || 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'40\' height=\'40\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%23888\' stroke-width=\'1.5\'%3E%3Ccircle cx=\'12\' cy=\'12\' r=\'10\'/%3E%3Cpath d=\'M12 6v6l4 2\'/%3E%3C/svg%3E';
       return '<div class="skills__item" data-category="' + (s.category || 'all') + '">'
-        + '<img class="skills__item-icon" src="' + icon + '" alt="' + s.name + '" loading="lazy">'
+        + '<img class="skills__item-icon" src="' + skillIcon(s.name) + '" alt="' + s.name + '" loading="lazy" crossorigin>'
         + '<span class="skills__item-name">' + s.name + '</span></div>';
     }).join('');
 
+    var countEl = document.getElementById('skills-count');
+    if (countEl) countEl.textContent = skills.length;
+
     var filters = document.querySelectorAll('.skills__filter');
-    var items = document.querySelectorAll('.skills__item');
+    var items = grid.querySelectorAll('.skills__item');
 
     filters.forEach(function(btn) {
       btn.addEventListener('click', function() {
@@ -38,6 +60,7 @@
         items.forEach(function(item) {
           item.style.display = (filter === 'all' || item.getAttribute('data-category') === filter) ? 'flex' : 'none';
         });
+        if (typeof ScrollTrigger !== 'undefined') ScrollTrigger.refresh();
       });
     });
   }

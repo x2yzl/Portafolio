@@ -60,9 +60,9 @@
   function setupScrollReveal() {
     document.querySelectorAll('[data-anim="fade-up"]').forEach(function(el) {
       var tl = gsap.timeline({ paused: true });
-      tl.from(el, { y: 40, opacity: 0, duration: 0.6, ease: 'power3.out' });
+      tl.from(el, { y: 50, opacity: 0, scale: 0.97, duration: 0.7, ease: 'power3.out' });
       ScrollTrigger.create({
-        trigger: el, start: 'top 85%',
+        trigger: el, start: 'top 88%',
         animation: tl,
         toggleActions: 'play none none reverse',
       });
@@ -70,9 +70,9 @@
 
     document.querySelectorAll('[data-anim="fade-left"]').forEach(function(el) {
       var tl = gsap.timeline({ paused: true });
-      tl.from(el, { x: -60, opacity: 0, duration: 0.7, ease: 'power3.out' });
+      tl.from(el, { x: -80, opacity: 0, rotationY: 8, duration: 0.8, ease: 'power3.out' });
       ScrollTrigger.create({
-        trigger: el, start: 'top 80%',
+        trigger: el, start: 'top 82%',
         animation: tl,
         toggleActions: 'play none none reverse',
       });
@@ -80,9 +80,9 @@
 
     document.querySelectorAll('[data-anim="fade-right"]').forEach(function(el) {
       var tl = gsap.timeline({ paused: true });
-      tl.from(el, { x: 60, opacity: 0, duration: 0.7, ease: 'power3.out' });
+      tl.from(el, { x: 80, opacity: 0, rotationY: -8, duration: 0.8, ease: 'power3.out' });
       ScrollTrigger.create({
-        trigger: el, start: 'top 80%',
+        trigger: el, start: 'top 82%',
         animation: tl,
         toggleActions: 'play none none reverse',
       });
@@ -91,13 +91,25 @@
 
   setupScrollReveal();
 
+  // Section titles with zoom effect
+  document.querySelectorAll('.section__title').forEach(function(el) {
+    var tl = gsap.timeline({ paused: true });
+    tl.from(el, { y: 30, opacity: 0, scale: 0.92, duration: 0.6, ease: 'back.out(1.4)' });
+    ScrollTrigger.create({
+      trigger: el,
+      start: 'top 85%',
+      animation: tl,
+      toggleActions: 'play none none reverse',
+    });
+  });
+
   function animateSkills() {
     var grid = document.getElementById('skills-grid');
     if (!grid) return;
 
     var items = grid.querySelectorAll('.skills__item');
     var tl = gsap.timeline({ paused: true });
-    tl.from(items, { y: 30, opacity: 0, scale: 0.9, duration: 0.4, stagger: 0.04, ease: 'back.out(1.7)' });
+    tl.from(items, { y: 40, opacity: 0, scale: 0.85, rotation: -3, duration: 0.5, stagger: 0.03, ease: 'back.out(1.7)' });
 
     ScrollTrigger.create({
       trigger: grid,
@@ -105,6 +117,19 @@
       animation: tl,
       toggleActions: 'play none none reverse',
     });
+
+    // Stats counter trigger
+    var countEl = document.getElementById('skills-count');
+    if (countEl) {
+      var ct = gsap.timeline({ paused: true });
+      ct.from(countEl, { textContent: 0, duration: 1.2, ease: 'power2.out', snap: { textContent: 1 } });
+      ScrollTrigger.create({
+        trigger: countEl,
+        start: 'top 90%',
+        animation: ct,
+        toggleActions: 'play none none reverse',
+      });
+    }
   }
 
   animateSkills();

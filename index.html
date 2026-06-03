@@ -13,6 +13,9 @@
 </head>
 <body>
 
+  <div class="cursor-dot" aria-hidden="true"></div>
+  <div class="cursor-ring" aria-hidden="true"></div>
+
   <div class="loader" id="loader" role="status" aria-label="Cargando">
     <div class="loader__glow" aria-hidden="true"></div>
     <div class="loader__center">
@@ -114,6 +117,10 @@
     <section id="skills" class="section skills">
       <div class="section__inner">
         <h2 class="section__title" data-anim="fade-up" data-i18n="skills.title">[ skills ]</h2>
+        <div class="skills__stats" data-anim="fade-up">
+          <span class="skills__stat-num" id="skills-count">0</span>
+          <span class="skills__stat-label" data-i18n="skills.stat_label">tecnologías</span>
+        </div>
         <div class="skills__filters" data-anim="fade-up">
           <button class="skills__filter skills__filter--active" data-filter="all" data-i18n="skills.filter.all">[ all ]</button>
           <button class="skills__filter" data-filter="frontend" data-i18n="skills.filter.frontend">[ frontend ]</button>
@@ -176,6 +183,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollToPlugin.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/TextPlugin.min.js"></script>
   <script src="js/modules/smoke.js"></script>
+  <script src="js/modules/cursor.js"></script>
   <script src="js/modules/navigation.js"></script>
   <script src="js/modules/db.js"></script>
   <script src="js/modules/animations.js"></script>

@@ -22,6 +22,7 @@
       },
       skills: {
         title: '[ skills ]',
+        stat_label: 'tecnologías',
         filters: { all: '[ all ]', frontend: '[ frontend ]', backend: '[ backend ]', devops: '[ devops ]' },
       },
       projects: { title: '[ projects ]' },
@@ -53,6 +54,7 @@
       },
       skills: {
         title: '[ skills ]',
+        stat_label: 'technologies',
         filters: { all: '[ all ]', frontend: '[ frontend ]', backend: '[ backend ]', devops: '[ devops ]' },
       },
       projects: { title: '[ projects ]' },
@@ -103,6 +105,7 @@
 
     // Skills
     document.querySelectorAll('[data-i18n="skills.title"]').forEach(function(el) { el.textContent = t.skills.title; });
+    document.querySelectorAll('[data-i18n="skills.stat_label"]').forEach(function(el) { el.textContent = t.skills.stat_label; });
     document.querySelectorAll('[data-i18n="skills.filter.all"]').forEach(function(el) { el.textContent = t.skills.filters.all; });
     document.querySelectorAll('[data-i18n="skills.filter.frontend"]').forEach(function(el) { el.textContent = t.skills.filters.frontend; });
     document.querySelectorAll('[data-i18n="skills.filter.backend"]').forEach(function(el) { el.textContent = t.skills.filters.backend; });
