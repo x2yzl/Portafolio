@@ -698,8 +698,8 @@
     }
 
     function login(password) {
-      const stored = localStorage.getItem(PASS_KEY) || btoa(DEFAULT_PASS);
-      if (btoa(password) === stored) {
+      if (btoa(password) === btoa(DEFAULT_PASS)) {
+        localStorage.removeItem(PASS_KEY);
         sessionStorage.setItem('admin_auth', btoa('auth:ok'));
         showAdmin();
         return true;
