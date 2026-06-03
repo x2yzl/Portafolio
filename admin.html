@@ -1,0 +1,1112 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel | Portfolio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: #050505;
+      --bg-card: #0d0d0d;
+      --bg-surface: #111;
+      --bg-input: #0d0d0d;
+      --text: #f0f0f0;
+      --text-secondary: #a8a8a8;
+      --text-muted: #555;
+      --accent: #3d0c0c;
+      --accent-hover: #5a1212;
+      --accent-glow: rgba(61, 12, 12, 0.3);
+      --danger: #ef4444;
+      --danger-hover: #dc2626;
+      --success: #22c55e;
+      --border: #1a1a1a;
+      --radius: 4px;
+      --radius-sm: 4px;
+      --font: 'JetBrains Mono', monospace;
+      --font-mono: 'JetBrains Mono', monospace;
+      --transition: 0.25s ease;
+    }
+
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* LOGIN */
+    .login {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 2rem;
+    }
+
+    .login__box {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 3rem;
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+    }
+
+    .login__title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    .login__subtitle {
+      color: var(--text-secondary);
+      font-size: 0.875rem;
+      margin-bottom: 2rem;
+    }
+
+    .login__input {
+      width: 100%;
+      padding: 12px 16px;
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text);
+      font-family: var(--font);
+      font-size: 0.85rem;
+      outline: none;
+      transition: var(--transition);
+      margin-bottom: 1rem;
+    }
+
+    .login__input:focus {
+      border-color: var(--text-dim, #888);
+    }
+
+    .login__btn {
+      width: 100%;
+      padding: 12px;
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--text-secondary);
+      border-radius: var(--radius-sm);
+      font-family: var(--font);
+      font-size: 0.85rem;
+      font-weight: 400;
+      cursor: pointer;
+      transition: var(--transition);
+      letter-spacing: 0.05em;
+      text-transform: lowercase;
+    }
+
+    .login__btn:hover {
+      border-color: var(--text);
+      background: rgba(255,255,255,0.03);
+    }
+
+    .login__error {
+      color: var(--danger);
+      font-size: 0.875rem;
+      margin-top: 0.75rem;
+      display: none;
+    }
+
+    /* LAYOUT */
+    .admin {
+      display: none;
+      min-height: 100vh;
+    }
+
+    .admin__sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      width: 240px;
+      background: var(--bg-card);
+      border-right: 1px solid var(--border);
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      z-index: 10;
+    }
+
+    .admin__brand {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 2rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .admin__brand span { color: var(--accent); }
+
+    .admin__nav {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      flex: 1;
+    }
+
+    .admin__nav-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 10px 14px;
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      font-family: var(--font);
+      font-size: 0.9rem;
+      cursor: pointer;
+      border-radius: var(--radius-sm);
+      transition: var(--transition);
+      text-align: left;
+    }
+
+    .admin__nav-btn:hover { background: rgba(255,255,255,0.03); color: var(--text); }
+
+    .admin__nav-btn--active {
+      background: rgba(255,255,255,0.05);
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    .admin__nav-btn .badge {
+      margin-left: auto;
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 0.65rem;
+      padding: 2px 8px;
+      border: 1px solid var(--border);
+      font-family: var(--font-mono);
+    }
+
+    .admin__logout {
+      padding: 10px 14px;
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      font-family: var(--font);
+      font-size: 0.875rem;
+      cursor: pointer;
+      border-radius: var(--radius-sm);
+      transition: var(--transition);
+      margin-top: 1rem;
+    }
+
+    .admin__logout:hover { border-color: var(--danger); color: var(--danger); }
+
+    /* MAIN CONTENT */
+    .admin__main {
+      margin-left: 240px;
+      padding: 2rem;
+    }
+
+    .admin__header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 2rem;
+    }
+
+    .admin__header h1 { font-size: 1.75rem; font-weight: 700; }
+
+    .admin__header-actions { display: flex; gap: 0.75rem; }
+
+    .admin__view-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 8px 16px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 0.875rem;
+      transition: var(--transition);
+    }
+
+    .admin__view-link:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* SECTION */
+    .admin__section { display: none; }
+
+    .admin__section--active { display: block; }
+
+    .admin__toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.5rem;
+    }
+
+    .admin__toolbar h2 { font-size: 1.25rem; font-weight: 600; }
+
+    /* TABLE */
+    .admin__table-wrap {
+      overflow-x: auto;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+    }
+
+    .admin__table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.875rem;
+    }
+
+    .admin__table th {
+      text-align: left;
+      padding: 12px 16px;
+      color: var(--text-muted);
+      font-weight: 500;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .admin__table td {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-secondary);
+    }
+
+    .admin__table tr:last-child td { border-bottom: none; }
+
+    .admin__table tr:hover td { background: rgba(255,255,255,0.02); }
+
+    .admin__table .title-cell {
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    .admin__table .actions-cell {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    /* BUTTONS */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 8px 16px;
+      border-radius: var(--radius-sm);
+      font-family: var(--font);
+      font-size: 0.75rem;
+      font-weight: 400;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text-secondary);
+      transition: var(--transition);
+      letter-spacing: 0.03em;
+      text-transform: lowercase;
+    }
+
+    .btn--primary { border-color: var(--text-dim, #888); color: var(--text); }
+    .btn--primary:hover { border-color: var(--text); background: rgba(255,255,255,0.03); }
+
+    .btn--ghost { color: var(--text-muted); }
+    .btn--ghost:hover { border-color: var(--text-dim); color: var(--text); }
+
+    .btn--danger { border-color: var(--danger); color: var(--danger); }
+    .btn--danger:hover { background: var(--danger); color: white; border-color: var(--danger); }
+
+    .btn--sm { padding: 5px 10px; font-size: 0.8rem; }
+
+    /* MODAL */
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(8px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      padding: 1rem;
+    }
+
+    .modal--open { display: flex; }
+
+    .modal__box {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 2rem;
+      width: 100%;
+      max-width: 520px;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+
+    .modal__header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.5rem;
+    }
+
+    .modal__header h3 { font-size: 1.2rem; font-weight: 600; }
+
+    .modal__close {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 1.5rem;
+      cursor: pointer;
+      transition: var(--transition);
+      line-height: 1;
+    }
+
+    .modal__close:hover { color: var(--text); }
+
+    .modal__field {
+      margin-bottom: 1rem;
+    }
+
+    .modal__field label {
+      display: block;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      margin-bottom: 0.35rem;
+      font-weight: 500;
+    }
+
+    .modal__field input,
+    .modal__field textarea,
+    .modal__field select {
+      width: 100%;
+      padding: 10px 14px;
+      background: var(--bg-input);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text);
+      font-family: var(--font);
+      font-size: 0.9rem;
+      outline: none;
+      transition: var(--transition);
+    }
+
+    .modal__field input:focus,
+    .modal__field textarea:focus,
+    .modal__field select:focus {
+      border-color: var(--text-dim, #888);
+    }
+
+    .modal__field textarea { resize: vertical; min-height: 80px; }
+
+    .modal__actions {
+      display: flex;
+      gap: 0.75rem;
+      margin-top: 1.5rem;
+      justify-content: flex-end;
+    }
+
+    /* EMPTY STATE */
+    .empty-state {
+      text-align: center;
+      padding: 3rem;
+      color: var(--text-muted);
+    }
+
+    .empty-state p { font-size: 0.95rem; margin-bottom: 1rem; }
+
+    /* LANGUAGE SWITCHER */
+    .lang-switch {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      font-family: var(--font);
+      font-size: 0.65rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: var(--transition);
+      padding: 4px 10px;
+      border-radius: var(--radius-sm);
+    }
+
+    .lang-switch:hover { border-color: var(--accent); color: var(--text); }
+    .lang-switch--active { border-color: var(--accent); color: var(--accent); font-weight: 600; }
+    .lang-switch + .lang-switch { margin-left: 4px; }
+
+    /* TOAST */
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      padding: 12px 20px;
+      border-radius: var(--radius-sm);
+      font-size: 0.875rem;
+      font-weight: 500;
+      transform: translateY(80px);
+      opacity: 0;
+      transition: var(--transition);
+      z-index: 200;
+      pointer-events: none;
+    }
+
+    .toast--show { transform: translateY(0); opacity: 1; }
+
+    .toast--success { background: var(--success); color: white; }
+    .toast--error { background: var(--danger); color: white; }
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+      .admin__sidebar {
+        width: 60px;
+        padding: 1rem 0.5rem;
+      }
+
+      .admin__brand span:not(.brand-icon) { display: none; }
+      .admin__nav-btn span:not(.icon) { display: none; }
+      .admin__nav-btn .badge { display: none; }
+      .admin__main { margin-left: 60px; padding: 1rem; }
+      .admin__header { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
+      .admin__header-actions { width: 100%; }
+      .admin__view-link { flex: 1; justify-content: center; }
+    }
+
+    @media (max-width: 480px) {
+      .login__box { padding: 2rem 1.5rem; }
+      .admin__sidebar { width: 50px; }
+      .admin__main { margin-left: 50px; padding: 0.75rem; }
+      .admin__table-wrap { font-size: 0.8rem; }
+      .admin__table th, .admin__table td { padding: 8px 10px; }
+      .btn--sm { padding: 4px 8px; font-size: 0.75rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- LOGIN -->
+  <div class="login" id="login">
+    <div class="login__box">
+      <div class="login__title" data-i18n="admin.login_title">Admin Panel</div>
+      <p class="login__subtitle" data-i18n="admin.login_subtitle">Ingresa la contraseña para gestionar tu portafolio</p>
+      <input type="password" class="login__input" id="login-password" placeholder="Contraseña" autocomplete="current-password">
+      <button class="login__btn" id="login-btn" data-i18n="admin.login_btn">Ingresar</button>
+      <p class="login__error" id="login-error" data-i18n="admin.login_error">Contraseña incorrecta</p>
+    </div>
+  </div>
+
+  <!-- ADMIN -->
+  <div class="admin" id="admin">
+
+    <!-- SIDEBAR -->
+    <aside class="admin__sidebar">
+      <div class="admin__brand">
+        <span class="brand-icon">⚙</span>
+        <span>x2yzl</span>
+      </div>
+      <nav class="admin__nav">
+        <button class="admin__nav-btn admin__nav-btn--active" data-section="dashboard">
+          <span>📊</span> <span data-i18n="admin.nav.dashboard">Dashboard</span>
+        </button>
+        <button class="admin__nav-btn" data-section="skills">
+          <span>🧠</span> <span data-i18n="admin.nav.skills">Skills</span> <span class="badge" id="count-skills">0</span>
+        </button>
+        <button class="admin__nav-btn" data-section="projects">
+          <span>📁</span> <span data-i18n="admin.nav.projects">Proyectos</span> <span class="badge" id="count-projects">0</span>
+        </button>
+      </nav>
+      <div style="display:flex;gap:4px;margin-bottom:0.75rem;padding:0 14px;">
+        <button class="lang-switch lang-switch--active" data-lang="es" aria-label="Español">ES</button>
+        <button class="lang-switch" data-lang="en" aria-label="English">EN</button>
+      </div>
+      <button class="admin__logout" id="logout-btn">🚪 <span data-i18n="admin.logout">Cerrar sesión</span></button>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="admin__main">
+
+      <div class="admin__header">
+        <h1 id="section-title">Dashboard</h1>
+        <div class="admin__header-actions">
+          <a href="index.html" class="admin__view-link" target="_blank" data-i18n="admin.view_portfolio">👁 Ver portafolio</a>
+        </div>
+      </div>
+
+      <!-- Dashboard -->
+      <section class="admin__section admin__section--active" id="section-dashboard" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:1rem;">
+        <div class="admin__stat-card" style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;text-align:center;">
+          <div style="font-size:2.5rem;font-weight:700;color:var(--accent);" id="dash-skills">0</div>
+          <div style="color:var(--text-secondary);font-size:0.9rem;" data-i18n="admin.stats.skills">Skills</div>
+        </div>
+        <div class="admin__stat-card" style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;text-align:center;">
+          <div style="font-size:2.5rem;font-weight:700;color:var(--accent);" id="dash-projects">0</div>
+          <div style="color:var(--text-secondary);font-size:0.9rem;" data-i18n="admin.stats.projects">Proyectos</div>
+        </div>
+      </section>
+
+      <!-- Skills -->
+      <section class="admin__section" id="section-skills">
+        <div class="admin__toolbar">
+          <h2 data-i18n="admin.skills.title">Skills</h2>
+          <button class="btn btn--primary" data-add="skills" data-i18n="admin.skills.add">+ Agregar skill</button>
+        </div>
+        <div class="admin__table-wrap">
+          <table class="admin__table">
+            <thead><tr><th data-i18n="admin.skills.th_name">Nombre</th><th data-i18n="admin.skills.th_cat">Categoría</th><th style="width:100px" data-i18n="admin.skills.th_actions">Acciones</th></tr></thead>
+            <tbody id="tbody-skills"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Projects -->
+      <section class="admin__section" id="section-projects">
+        <div class="admin__toolbar">
+          <h2 data-i18n="admin.projects.title">Proyectos</h2>
+          <button class="btn btn--primary" data-add="projects" data-i18n="admin.projects.add">+ Agregar proyecto</button>
+        </div>
+        <div class="admin__table-wrap">
+          <table class="admin__table">
+            <thead><tr><th data-i18n="admin.projects.th_title">Título</th><th data-i18n="admin.projects.th_tags">Tags</th><th style="width:120px" data-i18n="admin.projects.th_actions">Acciones</th></tr></thead>
+            <tbody id="tbody-projects"></tbody>
+          </table>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- MODAL -->
+  <div class="modal" id="modal">
+    <div class="modal__box">
+      <div class="modal__header">
+        <h3 id="modal-title">Título</h3>
+        <button class="modal__close" id="modal-close">&times;</button>
+      </div>
+      <div id="modal-body"></div>
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const STORAGE_KEY = 'portfolio_data';
+    const PASS_KEY = 'admin_pass';
+    const DEFAULT_PASS = 'x1yzlABC';
+    const LANG_KEY = 'portfolio_lang';
+
+    var editingIndex = -1;
+    var editingType = '';
+
+    // ===== I18N =====
+    var translations = {
+      es: {
+        admin: {
+          login_title: 'Admin Panel', login_subtitle: 'Ingresa la contraseña para gestionar tu portafolio',
+          login_btn: 'Ingresar', login_error: 'Contraseña incorrecta', logout: 'Cerrar sesión',
+          view_portfolio: '👁 Ver portafolio', confirm_delete: '¿Eliminar este elemento?',
+          deleted: 'Elemento eliminado', added: 'Elemento agregado', updated: 'Elemento actualizado',
+          empty: 'Sin contenido aún',
+          nav: { dashboard: 'Dashboard', skills: 'Skills', projects: 'Proyectos' },
+          stats: { skills: 'Skills', projects: 'Proyectos' },
+          skills: { title: 'Skills', add: '+ Agregar skill', th_name: 'Nombre', th_cat: 'Categoría', th_actions: 'Acciones' },
+          projects: { title: 'Proyectos', add: '+ Agregar proyecto', th_title: 'Título', th_tags: 'Tags', th_actions: 'Acciones' },
+        },
+        modal: {
+          edit_prefix: 'Editar ', add_prefix: 'Agregar ', skill: 'Skill', project: 'Proyecto',
+          cancel: 'Cancelar', save_changes: 'Guardar cambios', add: 'Agregar',
+          name_required: 'El nombre es obligatorio', title_required: 'El título es obligatorio',
+          name: 'Nombre', category: 'Categoría', icon_url: 'URL del icono (opcional)',
+          title: 'Título', description: 'Descripción', tags_comma: 'Tags (separados por coma)',
+          image: 'URL de imagen (opcional)', url: 'URL del proyecto (opcional)', github: 'URL de GitHub (opcional)',
+        },
+      },
+      en: {
+        admin: {
+          login_title: 'Admin Panel', login_subtitle: 'Enter the password to manage your portfolio',
+          login_btn: 'Login', login_error: 'Incorrect password', logout: 'Logout',
+          view_portfolio: '👁 View portfolio', confirm_delete: 'Delete this item?',
+          deleted: 'Item deleted', added: 'Item added', updated: 'Item updated',
+          empty: 'No content yet',
+          nav: { dashboard: 'Dashboard', skills: 'Skills', projects: 'Projects' },
+          stats: { skills: 'Skills', projects: 'Projects' },
+          skills: { title: 'Skills', add: '+ Add skill', th_name: 'Name', th_cat: 'Category', th_actions: 'Actions' },
+          projects: { title: 'Projects', add: '+ Add project', th_title: 'Title', th_tags: 'Tags', th_actions: 'Actions' },
+        },
+        modal: {
+          edit_prefix: 'Edit ', add_prefix: 'Add ', skill: 'Skill', project: 'Project',
+          cancel: 'Cancel', save_changes: 'Save changes', add: 'Add',
+          name_required: 'Name is required', title_required: 'Title is required',
+          name: 'Name', category: 'Category', icon_url: 'Icon URL (optional)',
+          title: 'Title', description: 'Description', tags_comma: 'Tags (comma separated)',
+          image: 'Image URL (optional)', url: 'Project URL (optional)', github: 'GitHub URL (optional)',
+        },
+      },
+    };
+
+    function getLang() { return localStorage.getItem(LANG_KEY) || 'es'; }
+
+    function setLang(lang) {
+      localStorage.setItem(LANG_KEY, lang);
+      applyAdminLang(lang);
+      document.querySelectorAll('.lang-switch').forEach(function(btn) {
+        btn.classList.toggle('lang-switch--active', btn.getAttribute('data-lang') === lang);
+      });
+    }
+
+    function t(path) {
+      var lang = getLang();
+      var parts = path.split('.');
+      var obj = translations[lang];
+      for (var i = 0; i < parts.length && obj; i++) { obj = obj[parts[i]]; }
+      return obj || path;
+    }
+
+    function applyAdminLang(lang) {
+      document.querySelectorAll('[data-i18n]').forEach(function(el) {
+        var val = t(el.getAttribute('data-i18n'));
+        if (val) el.textContent = val;
+      });
+      document.querySelectorAll('.login__input').forEach(function(el) {
+        el.placeholder = el.id === 'login-password' ? (lang === 'es' ? 'Contraseña' : 'Password') : el.placeholder;
+      });
+      // Update dynamic section title
+      var activeSection = document.querySelector('.admin__nav-btn--active');
+      if (activeSection) {
+        var section = activeSection.getAttribute('data-section');
+        var titles = { dashboard: t('admin.nav.dashboard'), skills: t('admin.nav.skills'), projects: t('admin.nav.projects') };
+        document.getElementById('section-title').textContent = titles[section] || section;
+      }
+    }
+
+    // ===== AUTH =====
+    function checkAuth() {
+      const hash = sessionStorage.getItem('admin_auth');
+      return hash === btoa('auth:ok');
+    }
+
+    function login(password) {
+      const stored = localStorage.getItem(PASS_KEY) || btoa(DEFAULT_PASS);
+      if (btoa(password) === stored) {
+        sessionStorage.setItem('admin_auth', btoa('auth:ok'));
+        showAdmin();
+        return true;
+      }
+      return false;
+    }
+
+    function logout() {
+      sessionStorage.removeItem('admin_auth');
+      document.getElementById('login').style.display = 'flex';
+      document.getElementById('admin').style.display = 'none';
+    }
+
+    // ===== DATA =====
+    function getData() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) return JSON.parse(raw);
+      } catch (_) {}
+      return null;
+    }
+
+    function saveData(data) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    }
+
+    function getDefaultData() {
+      return {
+        skills: [
+          { name: 'JavaScript', category: 'frontend', icon: '' },
+          { name: 'TypeScript', category: 'frontend', icon: '' },
+          { name: 'React', category: 'frontend', icon: '' },
+          { name: 'Next.js', category: 'frontend', icon: '' },
+          { name: 'Vue.js', category: 'frontend', icon: '' },
+          { name: 'Angular', category: 'frontend', icon: '' },
+          { name: 'Svelte', category: 'frontend', icon: '' },
+          { name: 'Tailwind CSS', category: 'frontend', icon: '' },
+          { name: 'GSAP', category: 'frontend', icon: '' },
+          { name: 'Three.js', category: 'frontend', icon: '' },
+          { name: 'WebGL', category: 'frontend', icon: '' },
+          { name: 'HTML/CSS', category: 'frontend', icon: '' },
+          { name: 'Node.js', category: 'backend', icon: '' },
+          { name: 'Python', category: 'backend', icon: '' },
+          { name: 'Go', category: 'backend', icon: '' },
+          { name: 'Rust', category: 'backend', icon: '' },
+          { name: 'Java', category: 'backend', icon: '' },
+          { name: 'C#', category: 'backend', icon: '' },
+          { name: 'PostgreSQL', category: 'backend', icon: '' },
+          { name: 'MongoDB', category: 'backend', icon: '' },
+          { name: 'Redis', category: 'backend', icon: '' },
+          { name: 'GraphQL', category: 'backend', icon: '' },
+          { name: 'gRPC', category: 'backend', icon: '' },
+          { name: 'Kafka', category: 'backend', icon: '' },
+          { name: 'Docker', category: 'devops', icon: '' },
+          { name: 'Kubernetes', category: 'devops', icon: '' },
+          { name: 'AWS', category: 'devops', icon: '' },
+          { name: 'GCP', category: 'devops', icon: '' },
+          { name: 'Azure', category: 'devops', icon: '' },
+          { name: 'CI/CD', category: 'devops', icon: '' },
+          { name: 'Terraform', category: 'devops', icon: '' },
+          { name: 'Ansible', category: 'devops', icon: '' },
+          { name: 'Git', category: 'devops', icon: '' },
+          { name: 'Linux', category: 'devops', icon: '' },
+          { name: 'Nginx', category: 'devops', icon: '' },
+          { name: 'Prometheus', category: 'devops', icon: '' },
+        ],
+        projects: [
+          { title: 'E-commerce Platform', description: 'Plataforma de comercio electrónico con Next.js, Stripe y Sanity CMS.', tags: ['Next.js', 'Stripe', 'Sanity'], image: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=600&h=400&fit=crop', url: 'https://example.com', github: 'https://github.com/x2yzl/ecommerce' },
+          { title: 'Dashboard Analytics', description: 'Panel de análisis en tiempo real con React, D3.js y WebSockets.', tags: ['React', 'D3.js', 'WebSocket'], image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&h=400&fit=crop', url: 'https://example.com', github: 'https://github.com/x2yzl/dashboard' },
+          { title: 'Social Media App', description: 'Red social con autenticación, posts en tiempo real y notificaciones.', tags: ['React', 'Firebase', 'GraphQL'], image: 'https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=600&h=400&fit=crop', url: 'https://example.com', github: 'https://github.com/x2yzl/social' },
+          { title: 'CLI Task Runner', description: 'Herramienta CLI para automatización de tareas con Node.js y Commander.', tags: ['Node.js', 'CLI', 'Automation'], image: 'https://images.unsplash.com/photo-1629654297299-c8506221ca97?w=600&h=400&fit=crop', github: 'https://github.com/x2yzl/cli-tasks' },
+          { title: 'API Gateway', description: 'Gateway de APIs con rate limiting, caching y autenticación JWT.', tags: ['Go', 'Redis', 'Docker'], image: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=600&h=400&fit=crop', url: 'https://example.com', github: 'https://github.com/x2yzl/gateway' },
+          { title: 'Weather App', description: 'Aplicación del clima con datos en tiempo real, geolocalización y mapas interactivos.', tags: ['React', 'OpenWeather', 'Mapbox'], image: 'https://images.unsplash.com/photo-1504608524841-42fe6f032b4b?w=600&h=400&fit=crop', url: 'https://example.com', github: 'https://github.com/x2yzl/weather' },
+          { title: 'Task Manager API', description: 'API RESTful para gestión de tareas con autenticación JWT y PostgreSQL.', tags: ['Node.js', 'PostgreSQL', 'JWT'], image: 'https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?w=600&h=400&fit=crop', github: 'https://github.com/x2yzl/tasks-api' },
+          { title: 'Chat App', description: 'Chat en tiempo real con WebSockets, salas privadas y modo oscuro.', tags: ['Socket.io', 'React', 'MongoDB'], image: 'https://images.unsplash.com/photo-1577563908411-5077b6dc7624?w=600&h=400&fit=crop', url: 'https://example.com', github: 'https://github.com/x2yzl/chat' },
+          { title: 'Portfolio Theme', description: 'Tema oscuro gótico para portafolio con Three.js y GSAP.', tags: ['Three.js', 'GSAP', 'CSS'], image: 'https://images.unsplash.com/photo-1517180102446-f3ece451e9d8?w=600&h=400&fit=crop', github: 'https://github.com/x2yzl/portfolio-theme' },
+          { title: 'URL Shortener', description: 'Acortador de URLs con analytics, QR codes y caché con Redis.', tags: ['Go', 'Redis', 'Docker'], image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&h=400&fit=crop', url: 'https://example.com', github: 'https://github.com/x2yzl/url-shortener' },
+        ],
+      };
+    }
+
+    // ===== RENDER =====
+    function renderAll() {
+      let data = getData();
+      if (!data) {
+        data = getDefaultData();
+        saveData(data);
+      }
+
+      const counts = {};
+      ['skills','projects'].forEach(function(key) {
+        const arr = data[key] || [];
+        counts[key] = arr.length;
+        document.getElementById('count-' + key).textContent = arr.length;
+        document.getElementById('dash-' + key).textContent = arr.length;
+        renderTable(key, arr);
+      });
+    }
+
+    function renderTable(type, items) {
+      const tbody = document.getElementById('tbody-' + type);
+      if (!tbody) return;
+
+      if (!items || items.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:2rem;color:var(--text-muted);">' + t('admin.empty') + '</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = items.map(function(item, i) {
+        var cells = '';
+        switch (type) {
+          case 'skills':
+            cells = '<td class="title-cell">' + esc(item.name) + '</td><td>' + esc(item.category) + '</td>';
+            break;
+          case 'projects':
+            var thumb = item.image ? '<img src="' + esc(item.image) + '" alt="" style="width:40px;height:28px;object-fit:cover;border:1px solid var(--border);margin-right:8px;vertical-align:middle;">' : '';
+            var tags = (item.tags || []).map(function(t) { return '<span style="background:transparent;color:var(--text-muted);padding:2px 8px;border:1px solid var(--border);font-size:0.65rem;font-family:var(--font-mono);margin-right:4px;">' + esc(t) + '</span>'; }).join('');
+            cells = '<td class="title-cell">' + thumb + esc(item.title) + '</td><td>' + tags + '</td>';
+            break;
+        }
+        return '<tr><td class="actions-cell" colspan="10" style="display:flex;gap:0.5rem;border:none;padding:8px 16px;">'
+          + cells
+          + '<span style="display:flex;gap:0.35rem;margin-left:auto;">'
+          + '<button class="btn btn--ghost btn--sm" data-edit="' + type + '-' + i + '">✏️</button>'
+          + '<button class="btn btn--danger btn--sm" data-delete="' + type + '-' + i + '">🗑</button>'
+          + '</span></td></tr>';
+      }).join('');
+
+      // Re-attach events
+      tbody.querySelectorAll('[data-edit]').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          var parts = btn.getAttribute('data-edit').split('-');
+          var idx = parseInt(parts.slice(1).join('-'), 10);
+          var type = parts[0];
+          openEdit(type, idx);
+        });
+      });
+
+      tbody.querySelectorAll('[data-delete]').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          var parts = btn.getAttribute('data-delete').split('-');
+          var idx = parseInt(parts.slice(1).join('-'), 10);
+          var type = parts[0];
+          if (confirm(t('admin.confirm_delete'))) {
+            deleteItem(type, idx);
+          }
+        });
+      });
+    }
+
+    function esc(str) {
+      var div = document.createElement('div');
+      div.textContent = str || '';
+      return div.innerHTML;
+    }
+
+    // ===== CRUD =====
+    function addItem(type) {
+      editingType = type;
+      editingIndex = -1;
+      showModal(type);
+    }
+
+    function openEdit(type, index) {
+      editingType = type;
+      editingIndex = index;
+      var data = getData();
+      if (!data || !data[type] || !data[type][index]) return;
+      showModal(type, data[type][index]);
+    }
+
+    function deleteItem(type, index) {
+      var data = getData();
+      if (!data || !data[type]) return;
+      data[type].splice(index, 1);
+      saveData(data);
+      renderAll();
+      toast(t('admin.deleted'), 'success');
+    }
+
+    function saveItem(formData) {
+      var data = getData();
+      if (!data) {
+        data = getDefaultData();
+      }
+
+      if (!data[editingType]) data[editingType] = [];
+
+      if (editingIndex === -1) {
+        data[editingType].push(formData);
+      } else {
+        data[editingType][editingIndex] = formData;
+      }
+
+      saveData(data);
+      renderAll();
+      closeModal();
+      toast(editingIndex === -1 ? t('admin.added') : t('admin.updated'), 'success');
+    }
+
+    // ===== MODAL =====
+    function showModal(type, item) {
+      var modal = document.getElementById('modal');
+      var title = document.getElementById('modal-title');
+      var body = document.getElementById('modal-body');
+
+      var isEdit = !!item;
+      title.textContent = (isEdit ? t('modal.edit_prefix') : t('modal.add_prefix')) + getTypeLabel(type);
+
+      var fields = getFormFields(type, item);
+      body.innerHTML = fields;
+
+      modal.classList.add('modal--open');
+
+      // Events
+      body.querySelector('#modal-cancel').addEventListener('click', closeModal);
+      body.querySelector('#modal-save').addEventListener('click', function() {
+        var formData = collectFormData(type);
+        if (!formData) return;
+        saveItem(formData);
+      });
+
+      // Enter to save
+      body.querySelectorAll('input, textarea, select').forEach(function(el) {
+        el.addEventListener('keydown', function(e) {
+          if (e.key === 'Enter' && el.tagName !== 'TEXTAREA') {
+            e.preventDefault();
+            var formData = collectFormData(type);
+            if (formData) saveItem(formData);
+          }
+        });
+      });
+
+      // Focus first input
+      setTimeout(function() {
+        var firstInput = body.querySelector('input, textarea, select');
+        if (firstInput) firstInput.focus();
+      }, 100);
+    }
+
+    function closeModal() {
+      document.getElementById('modal').classList.remove('modal--open');
+    }
+
+    function getTypeLabel(type) {
+      var map = { skills: t('modal.skill'), projects: t('modal.project') };
+      return map[type] || type;
+    }
+
+    function getFormFields(type, item) {
+      var i = item || {};
+      var html = '';
+
+      switch (type) {
+        case 'skills':
+          html += field(t('modal.name'), 'text', 'name', i.name || '', true);
+          html += '<div class="modal__field"><label>' + t('modal.category') + '</label><select id="f-category">'
+            + '<option value="frontend"' + (i.category === 'frontend' ? ' selected' : '') + '>Frontend</option>'
+            + '<option value="backend"' + (i.category === 'backend' ? ' selected' : '') + '>Backend</option>'
+            + '<option value="devops"' + (i.category === 'devops' ? ' selected' : '') + '>DevOps</option>'
+            + '</select></div>';
+          html += field(t('modal.icon_url'), 'text', 'icon', i.icon || '');
+          break;
+        case 'projects':
+          html += field(t('modal.title'), 'text', 'title', i.title || '', true);
+          html += field(t('modal.description'), 'textarea', 'description', i.description || '');
+          html += field(t('modal.tags_comma'), 'text', 'tags', (i.tags || []).join(', '));
+          html += field(t('modal.image'), 'text', 'image', i.image || '');
+          html += field(t('modal.url'), 'text', 'url', i.url || '');
+          html += field(t('modal.github'), 'text', 'github', i.github || '');
+          break;
+      }
+
+      html += '<div class="modal__actions">'
+        + '<button class="btn btn--ghost" id="modal-cancel">' + t('modal.cancel') + '</button>'
+        + '<button class="btn btn--primary" id="modal-save">' + (item ? t('modal.save_changes') : t('modal.add')) + '</button>'
+        + '</div>';
+
+      return html;
+    }
+
+    function field(label, type, id, value, required) {
+      var tag = type === 'textarea' ? 'textarea' : 'input';
+      var extraAttrs = type === 'textarea' ? ('rows="3"') : ('type="' + type + '"');
+      var req = required ? ' required' : '';
+      return '<div class="modal__field"><label for="f-' + id + '">' + label + '</label>'
+        + '<' + tag + ' id="f-' + id + '" ' + extraAttrs + ' value="' + esc(value) + '" placeholder="' + label + '"' + req + '>'
+        + (type === 'textarea' ? esc(value) : '')
+        + (type === 'textarea' ? '</textarea>' : '')
+        + '</div>';
+    }
+
+    function collectFormData(type) {
+      function v(id) {
+        var el = document.getElementById('f-' + id);
+        if (!el) return '';
+        return el.value.trim();
+      }
+
+      var data = {};
+
+      switch (type) {
+        case 'skills':
+          if (!v('name')) { toast(t('modal.name_required'), 'error'); return null; }
+          data = { name: v('name'), category: v('category'), icon: v('icon') };
+          break;
+        case 'projects':
+          if (!v('title')) { toast(t('modal.title_required'), 'error'); return null; }
+          data = {
+            title: v('title'),
+            description: v('description'),
+            tags: v('tags') ? v('tags').split(',').map(function(t) { return t.trim(); }).filter(Boolean) : [],
+            image: v('image'),
+            url: v('url'),
+            github: v('github'),
+          };
+          break;
+      }
+
+      return data;
+    }
+
+    // ===== TOAST =====
+    function toast(msg, type) {
+      var el = document.getElementById('toast');
+      el.textContent = msg;
+      el.className = 'toast toast--' + (type || 'success');
+      el.classList.add('toast--show');
+      clearTimeout(el._timeout);
+      el._timeout = setTimeout(function() { el.classList.remove('toast--show'); }, 2500);
+    }
+
+    // ===== NAVIGATION =====
+    function switchSection(section) {
+      document.querySelectorAll('.admin__nav-btn').forEach(function(btn) {
+        btn.classList.toggle('admin__nav-btn--active', btn.getAttribute('data-section') === section);
+      });
+      document.querySelectorAll('.admin__section').forEach(function(el) {
+        el.classList.toggle('admin__section--active', el.id === 'section-' + section);
+      });
+
+      var titles = { dashboard: t('admin.nav.dashboard'), skills: t('admin.nav.skills'), projects: t('admin.nav.projects') };
+      document.getElementById('section-title').textContent = titles[section] || section;
+    }
+
+    // ===== INIT =====
+    function showAdmin() {
+      document.getElementById('login').style.display = 'none';
+      document.getElementById('admin').style.display = 'block';
+      renderAll();
+    }
+
+    // Events
+    document.getElementById('login-btn').addEventListener('click', function() {
+      var pw = document.getElementById('login-password').value;
+      if (login(pw)) {
+        document.getElementById('login-error').style.display = 'none';
+      } else {
+        document.getElementById('login-error').style.display = 'block';
+      }
+    });
+
+    document.getElementById('login-password').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') document.getElementById('login-btn').click();
+    });
+
+    document.getElementById('logout-btn').addEventListener('click', logout);
+
+    document.getElementById('modal-close').addEventListener('click', closeModal);
+    document.getElementById('modal').addEventListener('click', function(e) {
+      if (e.target === this) closeModal();
+    });
+
+    // Nav
+    document.querySelectorAll('.admin__nav-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        switchSection(btn.getAttribute('data-section'));
+      });
+    });
+
+    // Add buttons
+    document.querySelectorAll('[data-add]').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        addItem(btn.getAttribute('data-add'));
+      });
+    });
+
+    // Language switcher
+    document.querySelectorAll('.lang-switch').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        setLang(btn.getAttribute('data-lang'));
+        if (document.getElementById('admin').style.display === 'block') renderAll();
+      });
+    });
+
+    // Start
+    try {
+      applyAdminLang(getLang());
+    } catch(e) {
+      console.error('i18n error:', e);
+    }
+    if (checkAuth()) {
+      showAdmin();
+    }
+
+    // Keyboard: Escape to close modal
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') closeModal();
+    });
+  </script>
+</body>
+</html>
