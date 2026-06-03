@@ -313,18 +313,6 @@ body::after {
   opacity: 0.5;
 }
 
-.vignette {
-  position: fixed;
-  inset: 0;
-  z-index: 1;
-  pointer-events: none;
-  background: radial-gradient(
-    ellipse 70% 60% at center 40%,
-    transparent 30%,
-    rgba(5, 5, 5, 0.7) 100%
-  );
-}
-
 #particles-canvas {
   position: fixed;
   inset: 0;
