@@ -9,6 +9,7 @@
       var skills = results[0] || [];
       var projects = results[1] || [];
       renderSkills(skills);
+      loadIconsLazy();
       renderProjects(projects);
       document.dispatchEvent(new CustomEvent('contentRendered'));
     }).catch(function(err) {
@@ -41,8 +42,8 @@
     if (!grid) return;
 
     grid.innerHTML = skills.map(function(s) {
-      return '<div class="skills__item" data-category="' + (s.category || 'all') + '">'
-        + '<img class="skills__item-icon" src="' + skillIcon(s.name) + '" alt="' + s.name + '" loading="lazy" crossorigin>'
+      return '<div class="skills__item" data-category="' + (s.category || 'all') + '" data-icon="' + skillIcon(s.name) + '">'
+        + '<div class="skills__item-icon"></div>'
         + '<span class="skills__item-name">' + s.name + '</span></div>';
     }).join('');
 
@@ -146,6 +147,34 @@
     document.addEventListener('keydown', function(e) {
       if (e.key === 'Escape') modal.classList.remove('modal--open');
     });
+  }
+
+  function loadIconsLazy() {
+    var grid = document.getElementById('skills-grid');
+    if (!grid) return;
+
+    var io = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        if (entry.isIntersecting) {
+          io.disconnect();
+          grid.querySelectorAll('.skills__item').forEach(function(item) {
+            var iconEl = item.querySelector('.skills__item-icon');
+            var src = item.getAttribute('data-icon');
+            if (iconEl && src) {
+              var img = document.createElement('img');
+              img.className = 'skills__item-icon';
+              img.src = src;
+              img.alt = item.querySelector('.skills__item-name').textContent;
+              img.loading = 'lazy';
+              img.crossOrigin = 'anonymous';
+              iconEl.replaceWith(img);
+            }
+          });
+        }
+      });
+    }, { rootMargin: '200px' });
+
+    io.observe(grid);
   }
 
   loadData();
