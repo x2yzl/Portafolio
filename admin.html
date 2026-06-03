@@ -780,18 +780,6 @@
           }
         });
       });
-      });
-
-      tbody.querySelectorAll('[data-delete]').forEach(function(btn) {
-        btn.addEventListener('click', function() {
-          var parts = btn.getAttribute('data-delete').split('-');
-          var idx = parseInt(parts.slice(1).join('-'), 10);
-          var type = parts[0];
-          if (confirm(t('admin.confirm_delete'))) {
-            deleteItem(type, idx);
-          }
-        });
-      });
     }
 
     function esc(str) {
