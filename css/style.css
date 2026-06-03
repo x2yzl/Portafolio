@@ -520,6 +520,30 @@ body::after {
   overflow: hidden;
 }
 
+.hero__video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+  opacity: 0.15;
+  filter: grayscale(0.8) contrast(0.6);
+  pointer-events: none;
+}
+
+.hero__overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(180deg,
+    rgba(5,5,5,0.7) 0%,
+    rgba(5,5,5,0.3) 50%,
+    rgba(5,5,5,0.85) 100%
+  );
+  pointer-events: none;
+}
+
 .hero__star {
   position: absolute;
   right: 60px;
