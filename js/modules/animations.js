@@ -65,7 +65,7 @@
     ScrollTrigger.create({
       trigger: el, start: 'top 88%',
       animation: tl,
-      toggleActions: 'restart none restart none',
+      toggleActions: 'play none none none',
     });
   }
 
@@ -99,7 +99,7 @@
     ScrollTrigger.create({
       trigger: el, start: 'top 85%',
       animation: tl,
-      toggleActions: 'restart none restart none',
+      toggleActions: 'play none none none',
     });
   });
 
@@ -118,7 +118,7 @@
     ScrollTrigger.create({
       trigger: '#skills-grid', start: 'top 80%',
       animation: tl,
-      toggleActions: 'restart none restart none',
+      toggleActions: 'play none none none',
     });
   }
 
@@ -135,7 +135,7 @@
     ScrollTrigger.create({
       trigger: '#projects-grid', start: 'top 82%',
       animation: tl,
-      toggleActions: 'restart none restart none',
+      toggleActions: 'play none none none',
     });
   }
 
@@ -148,7 +148,7 @@
     ScrollTrigger.create({
       trigger: countEl, start: 'top 90%',
       animation: ct,
-      toggleActions: 'restart none restart none',
+      toggleActions: 'play none none none',
     });
   }
 
