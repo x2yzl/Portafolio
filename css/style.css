@@ -549,10 +549,7 @@ body::after {
   z-index: 3;
   min-height: 100vh;
   display: flex;
-  flex-direction: column;
-  justify-content: center;
   align-items: center;
-  text-align: center;
   padding: var(--nav-height) var(--space-lg) var(--space-2xl);
   overflow: hidden;
 }
