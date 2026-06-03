@@ -91,7 +91,7 @@
       var image = p.image || 'assets/images/placeholder.svg';
       var tags = (p.tags || []).map(function(t) { return '<span class="project-card__tag">' + t + '</span>'; }).join('');
       return '<div class="project-card" data-index="' + i + '">'
-        + '<img class="project-card__image" src="' + image + '" alt="' + p.title + '" loading="lazy">'
+        + '<img class="project-card__image" src="' + image + '" alt="' + p.title + '" loading="lazy" decoding="async">'
         + '<div class="project-card__body">'
         + '<h3 class="project-card__title">' + p.title + '</h3>'
         + '<p class="project-card__description">' + (p.description || '') + '</p>'
