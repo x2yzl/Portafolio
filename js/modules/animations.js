@@ -57,68 +57,73 @@
 
   heroAnimation();
 
-  /* ===== CINEMATIC SCROLL REVEALS ===== */
+  /* ===== STATIC ELEMENT REVEALS ===== */
+  /* Set initial hidden state via gsap.set, then animate to() on scroll */
 
-  function cinematicFrom(el, vars) {
-    var tl = gsap.timeline({ paused: true });
-    tl.from(el, vars);
-    ScrollTrigger.create({
-      trigger: el, start: 'top 88%',
-      animation: tl,
-      toggleActions: 'play none none none',
+  gsap.set('[data-anim="fade-up"]', {
+    y: 60, opacity: 0, scale: 0.88,
+  });
+  gsap.set('[data-anim="fade-left"]', {
+    x: -100, opacity: 0, rotationY: 12,
+  });
+  gsap.set('[data-anim="fade-right"]', {
+    x: 100, opacity: 0, rotationY: -12,
+  });
+  gsap.set('.section__title', {
+    y: 40, opacity: 0, scale: 0.85,
+  });
+
+  function revealOnScroll(selector, vars, triggerStart) {
+    document.querySelectorAll(selector).forEach(function(el) {
+      ScrollTrigger.create({
+        trigger: el,
+        start: triggerStart || 'top 88%',
+        once: true,
+        onEnter: function() {
+          gsap.to(el, vars);
+        },
+      });
     });
   }
 
-  document.querySelectorAll('[data-anim="fade-up"]').forEach(function(el) {
-    cinematicFrom(el, {
-      y: 60, opacity: 0, scale: 0.88,
-      duration: 0.85, ease: 'power3.out',
-    });
+  revealOnScroll('[data-anim="fade-up"]', {
+    y: 0, opacity: 1, scale: 1,
+    duration: 0.85, ease: 'power3.out',
   });
 
-  document.querySelectorAll('[data-anim="fade-left"]').forEach(function(el) {
-    cinematicFrom(el, {
-      x: -100, opacity: 0, rotationY: 12,
-      duration: 0.9, ease: 'power3.out',
-    });
+  revealOnScroll('[data-anim="fade-left"]', {
+    x: 0, opacity: 1, rotationY: 0,
+    duration: 0.9, ease: 'power3.out',
   });
 
-  document.querySelectorAll('[data-anim="fade-right"]').forEach(function(el) {
-    cinematicFrom(el, {
-      x: 100, opacity: 0, rotationY: -12,
-      duration: 0.9, ease: 'power3.out',
-    });
+  revealOnScroll('[data-anim="fade-right"]', {
+    x: 0, opacity: 1, rotationY: 0,
+    duration: 0.9, ease: 'power3.out',
   });
 
-  document.querySelectorAll('.section__title').forEach(function(el) {
-    var tl = gsap.timeline({ paused: true });
-    tl.from(el, {
-      y: 40, opacity: 0, scale: 0.85,
-      duration: 0.8, ease: 'back.out(1.7)',
-    });
-    ScrollTrigger.create({
-      trigger: el, start: 'top 85%',
-      animation: tl,
-      toggleActions: 'play none none none',
-    });
-  });
+  revealOnScroll('.section__title', {
+    y: 0, opacity: 1, scale: 1,
+    duration: 0.8, ease: 'back.out(1.7)',
+  }, 'top 85%');
 
-  /* ===== DYNAMIC CONTENT ANIMATIONS ===== */
+  /* ===== DYNAMIC CONTENT REVEALS ===== */
 
   function animateSkills() {
     var items = document.querySelectorAll('.skills__item');
     if (items.length === 0) return;
 
-    var tl = gsap.timeline({ paused: true });
-    tl.from(items, {
-      y: 40, opacity: 0, scale: 0.8,
-      duration: 0.55, stagger: 0.035, ease: 'back.out(1.7)',
-    });
+    gsap.set(items, { y: 40, opacity: 0, scale: 0.8 });
 
     ScrollTrigger.create({
-      trigger: '#skills-grid', start: 'top 80%',
-      animation: tl,
-      toggleActions: 'play none none none',
+      trigger: '#skills-grid',
+      start: 'top 80%',
+      once: true,
+      onEnter: function() {
+        gsap.to(items, {
+          y: 0, opacity: 1, scale: 1,
+          duration: 0.55, stagger: 0.035, ease: 'back.out(1.7)',
+        });
+      },
     });
   }
 
@@ -126,16 +131,18 @@
     var cards = document.querySelectorAll('.project-card');
     if (cards.length === 0) return;
 
-    var tl = gsap.timeline({ paused: true });
-    tl.from(cards, {
-      y: 50, opacity: 0, scale: 0.92,
-      duration: 0.6, stagger: 0.08, ease: 'power3.out',
-    });
+    gsap.set(cards, { y: 50, opacity: 0, scale: 0.92 });
 
     ScrollTrigger.create({
-      trigger: '#projects-grid', start: 'top 82%',
-      animation: tl,
-      toggleActions: 'play none none none',
+      trigger: '#projects-grid',
+      start: 'top 82%',
+      once: true,
+      onEnter: function() {
+        gsap.to(cards, {
+          y: 0, opacity: 1, scale: 1,
+          duration: 0.6, stagger: 0.08, ease: 'power3.out',
+        });
+      },
     });
   }
 
@@ -143,12 +150,16 @@
     var countEl = document.getElementById('skills-count');
     if (!countEl) return;
 
-    var ct = gsap.timeline({ paused: true });
-    ct.from(countEl, { textContent: 0, duration: 1.2, ease: 'power2.out', snap: { textContent: 1 } });
     ScrollTrigger.create({
-      trigger: countEl, start: 'top 90%',
-      animation: ct,
-      toggleActions: 'play none none none',
+      trigger: countEl,
+      start: 'top 90%',
+      once: true,
+      onEnter: function() {
+        gsap.from(countEl, {
+          textContent: 0, duration: 1.2, ease: 'power2.out',
+          snap: { textContent: 1 },
+        });
+      },
     });
   }
 
