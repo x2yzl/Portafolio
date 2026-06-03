@@ -991,37 +991,6 @@ body::after {
   transition: border-color var(--transition), color var(--transition);
 }
 
-.projects__filters {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-  margin-bottom: var(--space-md);
-}
-
-.projects__filter {
-  padding: 4px 12px;
-  border: 1px solid var(--border);
-  background: transparent;
-  color: var(--text-dim);
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.65rem;
-  cursor: pointer;
-  transition: var(--transition);
-  text-transform: lowercase;
-  letter-spacing: 0.04em;
-}
-
-.projects__filter:hover {
-  border-color: var(--accent);
-  color: var(--text);
-}
-
-.projects__filter--active {
-  border-color: var(--accent);
-  color: var(--text);
-  background: rgba(61,12,12,0.05);
-}
-
 .projects__empty {
   grid-column: 1 / -1;
   text-align: center;
