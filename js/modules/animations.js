@@ -72,7 +72,6 @@
   document.querySelectorAll('[data-anim="fade-up"]').forEach(function(el) {
     cinematicFrom(el, {
       y: 60, opacity: 0, scale: 0.88,
-      filter: 'blur(6px)',
       duration: 0.85, ease: 'power3.out',
     });
   });
@@ -80,7 +79,6 @@
   document.querySelectorAll('[data-anim="fade-left"]').forEach(function(el) {
     cinematicFrom(el, {
       x: -100, opacity: 0, rotationY: 12,
-      filter: 'blur(4px)',
       duration: 0.9, ease: 'power3.out',
     });
   });
@@ -88,7 +86,6 @@
   document.querySelectorAll('[data-anim="fade-right"]').forEach(function(el) {
     cinematicFrom(el, {
       x: 100, opacity: 0, rotationY: -12,
-      filter: 'blur(4px)',
       duration: 0.9, ease: 'power3.out',
     });
   });
@@ -97,7 +94,6 @@
     var tl = gsap.timeline({ paused: true });
     tl.from(el, {
       y: 40, opacity: 0, scale: 0.85,
-      filter: 'blur(8px)',
       duration: 0.8, ease: 'back.out(1.7)',
     });
     ScrollTrigger.create({
@@ -107,67 +103,60 @@
     });
   });
 
-  function animateSkills() {
-    var grid = document.getElementById('skills-grid');
-    if (!grid) return;
+  /* ===== DYNAMIC CONTENT ANIMATIONS ===== */
 
-    var items = grid.querySelectorAll('.skills__item');
+  function animateSkills() {
+    var items = document.querySelectorAll('.skills__item');
+    if (items.length === 0) return;
+
     var tl = gsap.timeline({ paused: true });
     tl.from(items, {
-      y: 40, opacity: 0, scale: 0.8, rotation: gsap.utils.random(-4, 4, 1, true),
-      filter: 'blur(4px)',
+      y: 40, opacity: 0, scale: 0.8,
       duration: 0.55, stagger: 0.035, ease: 'back.out(1.7)',
     });
 
     ScrollTrigger.create({
-      trigger: grid, start: 'top 80%',
+      trigger: '#skills-grid', start: 'top 80%',
       animation: tl,
       toggleActions: 'play none none reverse',
     });
-
-    var countEl = document.getElementById('skills-count');
-    if (countEl) {
-      var ct = gsap.timeline({ paused: true });
-      ct.from(countEl, { textContent: 0, duration: 1.2, ease: 'power2.out', snap: { textContent: 1 } });
-      ScrollTrigger.create({
-        trigger: countEl, start: 'top 90%',
-        animation: ct,
-        toggleActions: 'play none none reverse',
-      });
-    }
   }
 
-  animateSkills();
-
   function animateProjectGrid() {
-    var grid = document.getElementById('projects-grid');
-    if (!grid) return;
-
-    var cards = grid.querySelectorAll('.project-card');
+    var cards = document.querySelectorAll('.project-card');
     if (cards.length === 0) return;
 
     var tl = gsap.timeline({ paused: true });
     tl.from(cards, {
       y: 50, opacity: 0, scale: 0.92,
-      filter: 'blur(6px)',
       duration: 0.6, stagger: 0.08, ease: 'power3.out',
     });
 
     ScrollTrigger.create({
-      trigger: grid, start: 'top 82%',
+      trigger: '#projects-grid', start: 'top 82%',
       animation: tl,
       toggleActions: 'play none none reverse',
     });
   }
 
-  animateProjectGrid();
+  function animateStats() {
+    var countEl = document.getElementById('skills-count');
+    if (!countEl) return;
+
+    var ct = gsap.timeline({ paused: true });
+    ct.from(countEl, { textContent: 0, duration: 1.2, ease: 'power2.out', snap: { textContent: 1 } });
+    ScrollTrigger.create({
+      trigger: countEl, start: 'top 90%',
+      animation: ct,
+      toggleActions: 'play none none reverse',
+    });
+  }
 
   /* ===== GLOW PULSE HOVER EFFECTS ===== */
 
   function glowOnEnter(el) {
     gsap.to(el, {
       scale: 1.06,
-      borderColor: 'rgba(90,18,18,0.6)',
       boxShadow: '0 0 25px rgba(61,12,12,0.35), 0 0 50px rgba(61,12,12,0.12)',
       duration: 0.3, ease: 'power2.out', overwrite: 'auto',
     });
@@ -176,25 +165,48 @@
   function glowOnLeave(el) {
     gsap.to(el, {
       scale: 1,
-      borderColor: '',
-      boxShadow: '',
+      boxShadow: 'none',
       duration: 0.35, ease: 'power2.out', overwrite: 'auto',
     });
   }
 
-  document.querySelectorAll('.skills__item').forEach(function(item) {
-    item.addEventListener('mouseenter', function() { glowOnEnter(item); });
-    item.addEventListener('mouseleave', function() { glowOnLeave(item); });
-  });
+  function bindSkillHovers() {
+    document.querySelectorAll('.skills__item').forEach(function(item) {
+      item.addEventListener('mouseenter', function() { glowOnEnter(item); });
+      item.addEventListener('mouseleave', function() { glowOnLeave(item); });
+    });
+  }
 
-  document.querySelectorAll('.contact__card').forEach(function(card) {
-    card.addEventListener('mouseenter', function() { glowOnEnter(card); });
-    card.addEventListener('mouseleave', function() { glowOnLeave(card); });
-  });
+  function bindContactHovers() {
+    document.querySelectorAll('.contact__card').forEach(function(card) {
+      card.addEventListener('mouseenter', function() { glowOnEnter(card); });
+      card.addEventListener('mouseleave', function() { glowOnLeave(card); });
+    });
+  }
+
+  function bindProjectHovers() {
+    document.querySelectorAll('.project-card').forEach(function(card) {
+      card.addEventListener('mouseenter', function() { projectCardEnter(card); });
+      card.addEventListener('mouseleave', function() { projectCardLeave(card); });
+
+      card.addEventListener('mousemove', function(e) {
+        var rect = card.getBoundingClientRect();
+        var x = e.clientX - rect.left;
+        var y = e.clientY - rect.top;
+        var rotateX = (y - rect.height / 2) / (rect.height / 2) * -8;
+        var rotateY = (x - rect.width / 2) / (rect.width / 2) * 8;
+        gsap.to(card, { rotationX: rotateX, rotationY: rotateY, transformPerspective: 1000, duration: 0.3, ease: 'power2.out', overwrite: 'auto' });
+      });
+
+      card.addEventListener('mouseleave', function() {
+        gsap.to(card, { rotationX: 0, rotationY: 0, duration: 0.4, ease: 'power2.out' });
+      });
+    });
+  }
 
   function projectCardEnter(card) {
     gsap.to(card.querySelector('.project-card__image'), {
-      scale: 1.05, filter: 'grayscale(0.2)',
+      scale: 1.05,
       duration: 0.4, ease: 'power2.out', overwrite: 'auto',
     });
     gsap.to(card, {
@@ -205,31 +217,23 @@
 
   function projectCardLeave(card) {
     gsap.to(card.querySelector('.project-card__image'), {
-      scale: 1, filter: 'grayscale(0.9)',
+      scale: 1,
       duration: 0.4, ease: 'power2.out', overwrite: 'auto',
     });
     gsap.to(card, {
-      boxShadow: '',
+      boxShadow: 'none',
       duration: 0.35, ease: 'power2.out', overwrite: 'auto',
     });
   }
 
-  document.querySelectorAll('.project-card').forEach(function(card) {
-    card.addEventListener('mouseenter', function() { projectCardEnter(card); });
-    card.addEventListener('mouseleave', function() { projectCardLeave(card); });
-
-    card.addEventListener('mousemove', function(e) {
-      var rect = card.getBoundingClientRect();
-      var x = e.clientX - rect.left;
-      var y = e.clientY - rect.top;
-      var rotateX = (y - rect.height / 2) / (rect.height / 2) * -8;
-      var rotateY = (x - rect.width / 2) / (rect.width / 2) * 8;
-      gsap.to(card, { rotationX: rotateX, rotationY: rotateY, transformPerspective: 1000, duration: 0.3, ease: 'power2.out', overwrite: 'auto' });
-    });
-
-    card.addEventListener('mouseleave', function() {
-      gsap.to(card, { rotationX: 0, rotationY: 0, duration: 0.4, ease: 'power2.out' });
-    });
+  document.addEventListener('contentRendered', function() {
+    animateSkills();
+    animateProjectGrid();
+    animateStats();
+    bindSkillHovers();
+    bindProjectHovers();
+    bindContactHovers();
+    ScrollTrigger.refresh();
   });
 
   window.addEventListener('load', function() { ScrollTrigger.refresh(); });

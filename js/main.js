@@ -10,7 +10,7 @@
       var projects = results[1] || [];
       renderSkills(skills);
       renderProjects(projects);
-      if (typeof ScrollTrigger !== 'undefined') ScrollTrigger.refresh();
+      document.dispatchEvent(new CustomEvent('contentRendered'));
     }).catch(function(err) {
       console.error('db error:', err);
     });
