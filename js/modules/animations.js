@@ -58,7 +58,7 @@
   heroAnimation();
 
   /* ===== STATIC ELEMENT REVEALS ===== */
-  /* Set initial hidden state via gsap.set, then animate to() on scroll */
+  /* Elements animate in every time they enter viewport (both directions) */
 
   gsap.set('[data-anim="fade-up"]', {
     y: 60, opacity: 0, scale: 0.88,
@@ -73,38 +73,41 @@
     y: 40, opacity: 0, scale: 0.85,
   });
 
-  function revealOnScroll(selector, vars, triggerStart) {
+  function revealOnScroll(selector, fromVars, toVars, triggerStart) {
     document.querySelectorAll(selector).forEach(function(el) {
       ScrollTrigger.create({
         trigger: el,
-        start: triggerStart || 'top 88%',
-        once: true,
+        start: triggerStart || 'top 90%',
         onEnter: function() {
-          gsap.to(el, vars);
+          gsap.fromTo(el, fromVars, toVars);
+        },
+        onEnterBack: function() {
+          gsap.fromTo(el, fromVars, toVars);
         },
       });
     });
   }
 
-  revealOnScroll('[data-anim="fade-up"]', {
-    y: 0, opacity: 1, scale: 1,
-    duration: 0.85, ease: 'power3.out',
-  });
+  revealOnScroll('[data-anim="fade-up"]',
+    { y: 60, opacity: 0, scale: 0.88 },
+    { y: 0, opacity: 1, scale: 1, duration: 0.85, ease: 'power3.out', immediateRender: false }
+  );
 
-  revealOnScroll('[data-anim="fade-left"]', {
-    x: 0, opacity: 1, rotationY: 0,
-    duration: 0.9, ease: 'power3.out',
-  });
+  revealOnScroll('[data-anim="fade-left"]',
+    { x: -100, opacity: 0, rotationY: 12 },
+    { x: 0, opacity: 1, rotationY: 0, duration: 0.9, ease: 'power3.out', immediateRender: false }
+  );
 
-  revealOnScroll('[data-anim="fade-right"]', {
-    x: 0, opacity: 1, rotationY: 0,
-    duration: 0.9, ease: 'power3.out',
-  });
+  revealOnScroll('[data-anim="fade-right"]',
+    { x: 100, opacity: 0, rotationY: -12 },
+    { x: 0, opacity: 1, rotationY: 0, duration: 0.9, ease: 'power3.out', immediateRender: false }
+  );
 
-  revealOnScroll('.section__title', {
-    y: 0, opacity: 1, scale: 1,
-    duration: 0.8, ease: 'back.out(1.7)',
-  }, 'top 85%');
+  revealOnScroll('.section__title',
+    { y: 40, opacity: 0, scale: 0.85 },
+    { y: 0, opacity: 1, scale: 1, duration: 0.8, ease: 'back.out(1.7)', immediateRender: false },
+    'top 85%'
+  );
 
   /* ===== DYNAMIC CONTENT REVEALS ===== */
 
@@ -117,12 +120,17 @@
     ScrollTrigger.create({
       trigger: '#skills-grid',
       start: 'top 80%',
-      once: true,
       onEnter: function() {
-        gsap.to(items, {
-          y: 0, opacity: 1, scale: 1,
-          duration: 0.55, stagger: 0.035, ease: 'back.out(1.7)',
-        });
+        gsap.fromTo(items,
+          { y: 40, opacity: 0, scale: 0.8 },
+          { y: 0, opacity: 1, scale: 1, duration: 0.55, stagger: 0.035, ease: 'back.out(1.7)', immediateRender: false }
+        );
+      },
+      onEnterBack: function() {
+        gsap.fromTo(items,
+          { y: 40, opacity: 0, scale: 0.8 },
+          { y: 0, opacity: 1, scale: 1, duration: 0.55, stagger: 0.035, ease: 'back.out(1.7)', immediateRender: false }
+        );
       },
     });
   }
@@ -136,12 +144,17 @@
     ScrollTrigger.create({
       trigger: '#projects-grid',
       start: 'top 82%',
-      once: true,
       onEnter: function() {
-        gsap.to(cards, {
-          y: 0, opacity: 1, scale: 1,
-          duration: 0.6, stagger: 0.08, ease: 'power3.out',
-        });
+        gsap.fromTo(cards,
+          { y: 50, opacity: 0, scale: 0.92 },
+          { y: 0, opacity: 1, scale: 1, duration: 0.6, stagger: 0.08, ease: 'power3.out', immediateRender: false }
+        );
+      },
+      onEnterBack: function() {
+        gsap.fromTo(cards,
+          { y: 50, opacity: 0, scale: 0.92 },
+          { y: 0, opacity: 1, scale: 1, duration: 0.6, stagger: 0.08, ease: 'power3.out', immediateRender: false }
+        );
       },
     });
   }
@@ -153,12 +166,11 @@
     ScrollTrigger.create({
       trigger: countEl,
       start: 'top 90%',
-      once: true,
       onEnter: function() {
-        gsap.from(countEl, {
-          textContent: 0, duration: 1.2, ease: 'power2.out',
-          snap: { textContent: 1 },
-        });
+        gsap.from(countEl, { textContent: 0, duration: 1.2, ease: 'power2.out', snap: { textContent: 1 } });
+      },
+      onEnterBack: function() {
+        gsap.from(countEl, { textContent: 0, duration: 1.2, ease: 'power2.out', snap: { textContent: 1 } });
       },
     });
   }
