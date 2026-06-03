@@ -7,7 +7,7 @@
   var ctx = canvas.getContext('2d');
   var particles = [];
   var mouse = { x: 0.5, y: 0.5 };
-  var rafId;
+  var frameSkip = 0;
 
   function resize() {
     canvas.width = window.innerWidth;
@@ -22,7 +22,7 @@
     mouse.y = e.clientY / window.innerHeight;
   });
 
-  var COUNT = 80;
+  var COUNT = 40;
 
   function createParticle() {
     return {
@@ -30,7 +30,7 @@
       y: Math.random() * canvas.height,
       vx: (Math.random() - 0.5) * 0.04,
       vy: (Math.random() - 0.5) * 0.02 - 0.02,
-      size: Math.random() * 180 + 80,
+      size: Math.random() * 120 + 60,
       alpha: Math.random() * 0.04 + 0.01,
       life: Math.random() * 2000,
     };
@@ -41,6 +41,7 @@
   }
 
   function draw() {
+    frameSkip++;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     for (var i = 0; i < particles.length; i++) {
@@ -52,19 +53,21 @@
       p.size += (Math.random() - 0.5) * 0.15;
 
       if (p.size < 60) p.size = 60;
-      if (p.size > 350) p.size = 350;
+      if (p.size > 250) p.size = 250;
 
       var pulseAlpha = p.alpha + Math.sin(p.life * 0.003) * 0.015;
 
-      var gradient = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.size);
-      gradient.addColorStop(0, 'rgba(80, 80, 85, ' + (pulseAlpha) + ')');
-      gradient.addColorStop(0.3, 'rgba(40, 40, 45, ' + (pulseAlpha * 0.6) + ')');
-      gradient.addColorStop(1, 'rgba(20, 20, 25, 0)');
+      if (frameSkip % 2 === 0) {
+        var gradient = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.size);
+        gradient.addColorStop(0, 'rgba(80, 80, 85, ' + (pulseAlpha) + ')');
+        gradient.addColorStop(0.3, 'rgba(40, 40, 45, ' + (pulseAlpha * 0.6) + ')');
+        gradient.addColorStop(1, 'rgba(20, 20, 25, 0)');
 
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-      ctx.fillStyle = gradient;
-      ctx.fill();
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fillStyle = gradient;
+        ctx.fill();
+      }
 
       if (p.life > 2000) {
         particles[i] = createParticle();
@@ -73,7 +76,7 @@
       }
     }
 
-    rafId = requestAnimationFrame(draw);
+    requestAnimationFrame(draw);
   }
 
   draw();

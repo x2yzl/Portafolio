@@ -4,6 +4,10 @@
   box-sizing: border-box;
 }
 
+[data-anim] {
+  will-change: transform, opacity;
+}
+
 .cursor-dot,
 .cursor-ring {
   position: fixed;
@@ -527,8 +531,8 @@ body::after {
   height: 100vh;
   object-fit: cover;
   z-index: 0;
-  opacity: 0.55;
-  filter: grayscale(0.5) contrast(0.7);
+  opacity: 0.4;
+  filter: grayscale(0.4) contrast(0.8);
   pointer-events: none;
 }
 
@@ -736,6 +740,7 @@ body::after {
   display: inline-block;
   color: var(--text);
   position: relative;
+  will-change: transform, opacity;
 }
 
 .section__title::after {
@@ -760,6 +765,7 @@ body::after {
 .about__text[data-anim="fade-right"] {
   perspective: 1000px;
 }
+.about__image-frame {
   position: relative;
   overflow: hidden;
   border: 1px solid var(--border);
@@ -867,6 +873,7 @@ body::after {
   transition: var(--transition);
   cursor: default;
   text-align: center;
+  will-change: transform, opacity, box-shadow;
 }
 
 .skills__item:hover {
@@ -914,6 +921,7 @@ body::after {
   overflow: hidden;
   transition: var(--transition);
   cursor: pointer;
+  will-change: transform, box-shadow, opacity;
 }
 
 .project-card:hover {

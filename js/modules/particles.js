@@ -7,8 +7,7 @@
   var ctx = canvas.getContext('2d');
   var particles = [];
   var mouse = { x: -9999, y: -9999 };
-  var rafId;
-  var CONNECT_DIST = 120;
+  var frameSkip = 0;
 
   function resize() {
     canvas.width = window.innerWidth;
@@ -27,7 +26,7 @@
     mouse.y = -9999;
   });
 
-  var COUNT = 70;
+  var COUNT = 45;
 
   function createParticle() {
     return {
@@ -48,6 +47,9 @@
 
   function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    frameSkip++;
+
+    var drawLines = frameSkip % 2 === 0;
 
     for (var i = 0; i < particles.length; i++) {
       var p = particles[i];
@@ -76,24 +78,26 @@
       ctx.fillStyle = 'rgba(92, 16, 16, ' + Math.max(0, alpha) + ')';
       ctx.fill();
 
-      for (var j = i + 1; j < particles.length; j++) {
-        var p2 = particles[j];
-        var dx2 = p.x - p2.x;
-        var dy2 = p.y - p2.y;
-        var d2 = Math.sqrt(dx2 * dx2 + dy2 * dy2);
-        if (d2 < CONNECT_DIST) {
-          var lineAlpha = (1 - d2 / CONNECT_DIST) * 0.12;
-          ctx.beginPath();
-          ctx.moveTo(p.x, p.y);
-          ctx.lineTo(p2.x, p2.y);
-          ctx.strokeStyle = 'rgba(61, 12, 12, ' + lineAlpha + ')';
-          ctx.lineWidth = 0.5;
-          ctx.stroke();
+      if (drawLines) {
+        for (var j = i + 1; j < particles.length; j++) {
+          var p2 = particles[j];
+          var dx2 = p.x - p2.x;
+          var dy2 = p.y - p2.y;
+          var d2 = dx2 * dx2 + dy2 * dy2;
+          if (d2 < 10000) {
+            var lineAlpha = (1 - Math.sqrt(d2) / 100) * 0.12;
+            ctx.beginPath();
+            ctx.moveTo(p.x, p.y);
+            ctx.lineTo(p2.x, p2.y);
+            ctx.strokeStyle = 'rgba(61, 12, 12, ' + lineAlpha + ')';
+            ctx.lineWidth = 0.5;
+            ctx.stroke();
+          }
         }
       }
     }
 
-    rafId = requestAnimationFrame(draw);
+    requestAnimationFrame(draw);
   }
 
   draw();
