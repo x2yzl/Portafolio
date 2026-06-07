@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin Panel | Portfolio</title>
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://*.supabase.co; frame-src 'none'; object-src 'none'; base-uri 'none';">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -601,10 +602,14 @@
 
   <script src="js/modules/db.js"></script>
   <script>
-    const STORAGE_KEY = 'portfolio_data';
-    const PASS_KEY = 'admin_pass';
-    const DEFAULT_PASS = 'x1yzlABC';
     const LANG_KEY = 'portfolio_lang';
+    const ADMIN_PASS_HASH = '451386607f4f751031c0b81767ac1c7b544c7c211a74fa1f9ada1fb8ee55ffe8';
+    const MAX_LOGIN_ATTEMPTS = 3;
+    const LOCKOUT_MS = 30000;
+    const SESSION_TIMEOUT_MS = 15 * 60 * 1000;
+    const LOCKOUT_ATTEMPTS_KEY = 'admin_lockout_attempts';
+    const LOCKOUT_UNTIL_KEY = 'admin_lockout_until';
+    const LAST_ACTIVE_KEY = 'admin_last_active';
 
     var editingIndex = -1;
     var editingType = '';
@@ -692,25 +697,110 @@
     }
 
     // ===== AUTH =====
-    function checkAuth() {
-      const hash = sessionStorage.getItem('admin_auth');
-      return hash === btoa('auth:ok');
+    async function hashSHA256(str) {
+      var buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+      return Array.from(new Uint8Array(buf)).map(function(b) { return b.toString(16).padStart(2, '0'); }).join('');
     }
 
-    function login(password) {
-      if (btoa(password) === btoa(DEFAULT_PASS)) {
-        localStorage.removeItem(PASS_KEY);
-        sessionStorage.setItem('admin_auth', btoa('auth:ok'));
+    function getLockoutAttempts() {
+      return parseInt(localStorage.getItem(LOCKOUT_ATTEMPTS_KEY) || '0', 10);
+    }
+
+    function setLockoutAttempts(val) {
+      if (val <= 0) localStorage.removeItem(LOCKOUT_ATTEMPTS_KEY);
+      else localStorage.setItem(LOCKOUT_ATTEMPTS_KEY, val.toString());
+    }
+
+    function getLockoutUntil() {
+      return parseInt(localStorage.getItem(LOCKOUT_UNTIL_KEY) || '0', 10);
+    }
+
+    function setLockoutUntil(val) {
+      if (val <= 0) localStorage.removeItem(LOCKOUT_UNTIL_KEY);
+      else localStorage.setItem(LOCKOUT_UNTIL_KEY, val.toString());
+    }
+
+    function checkAuth() {
+      if (sessionStorage.getItem('admin_auth') !== 'auth:ok') return false;
+      var lastActive = parseInt(sessionStorage.getItem(LAST_ACTIVE_KEY) || '0', 10);
+      if (Date.now() - lastActive > SESSION_TIMEOUT_MS) {
+        sessionStorage.removeItem('admin_auth');
+        sessionStorage.removeItem(LAST_ACTIVE_KEY);
+        return false;
+      }
+      touchSession();
+      return true;
+    }
+
+    function touchSession() {
+      sessionStorage.setItem(LAST_ACTIVE_KEY, Date.now().toString());
+    }
+
+    function loginErrorMsg(custom) {
+      var lang = getLang();
+      if (custom) return custom;
+      return lang === 'es' ? 'Contraseña incorrecta' : 'Incorrect password';
+    }
+
+    function lockoutMsg(seconds) {
+      var lang = getLang();
+      return lang === 'es'
+        ? 'Demasiados intentos. Espera ' + seconds + 's.'
+        : 'Too many attempts. Wait ' + seconds + 's.';
+    }
+
+    async function login(password) {
+      var now = Date.now();
+      var lockoutUntil = getLockoutUntil();
+
+      if (now < lockoutUntil) {
+        var remaining = Math.ceil((lockoutUntil - now) / 1000);
+        document.getElementById('login-error').textContent = lockoutMsg(remaining);
+        document.getElementById('login-error').style.display = 'block';
+        return false;
+      }
+
+      var startTime = Date.now();
+      var hash = await hashSHA256(password);
+      var elapsed = Date.now() - startTime;
+      var minDelay = 500;
+      if (elapsed < minDelay) {
+        await new Promise(function(resolve) { setTimeout(resolve, minDelay - elapsed); });
+      }
+
+      if (hash === ADMIN_PASS_HASH) {
+        setLockoutAttempts(0);
+        setLockoutUntil(0);
+        sessionStorage.setItem('admin_auth', 'auth:ok');
+        touchSession();
         showAdmin();
         return true;
       }
+
+      var attempts = getLockoutAttempts() + 1;
+      setLockoutAttempts(attempts);
+
+      if (attempts >= MAX_LOGIN_ATTEMPTS) {
+        setLockoutUntil(Date.now() + LOCKOUT_MS);
+        var remaining = Math.ceil(LOCKOUT_MS / 1000);
+        document.getElementById('login-error').textContent = lockoutMsg(remaining);
+        setLockoutAttempts(0);
+      } else {
+        document.getElementById('login-error').textContent = loginErrorMsg();
+      }
+
+      document.getElementById('login-error').style.display = 'block';
+      document.getElementById('login-password').value = '';
       return false;
     }
 
     function logout() {
       sessionStorage.removeItem('admin_auth');
+      sessionStorage.removeItem(LAST_ACTIVE_KEY);
       document.getElementById('login').style.display = 'flex';
       document.getElementById('admin').style.display = 'none';
+      document.getElementById('login-password').value = '';
+      document.getElementById('login-error').style.display = 'none';
     }
 
     // ===== DATA =====
@@ -786,6 +876,11 @@
       var div = document.createElement('div');
       div.textContent = str || '';
       return div.innerHTML;
+    }
+
+    function sanitize(str) {
+      if (typeof str !== 'string') return str || '';
+      return str.replace(/<[^>]*>/g, '').trim();
     }
 
     // ===== CRUD =====
@@ -941,17 +1036,17 @@
       switch (type) {
         case 'skills':
           if (!v('name')) { toast(t('modal.name_required'), 'error'); return null; }
-          data = { name: v('name'), category: v('category'), icon: v('icon') };
+          data = { name: sanitize(v('name')), category: v('category'), icon: sanitize(v('icon')) };
           break;
         case 'projects':
           if (!v('title')) { toast(t('modal.title_required'), 'error'); return null; }
           data = {
-            title: v('title'),
-            description: v('description'),
-            tags: v('tags') ? v('tags').split(',').map(function(t) { return t.trim(); }).filter(Boolean) : [],
-            image: v('image'),
-            url: v('url'),
-            github: v('github'),
+            title: sanitize(v('title')),
+            description: sanitize(v('description')),
+            tags: v('tags') ? v('tags').split(',').map(function(t) { return sanitize(t); }).filter(Boolean) : [],
+            image: sanitize(v('image')),
+            url: sanitize(v('url')),
+            github: sanitize(v('github')),
           };
           break;
       }
@@ -990,13 +1085,10 @@
     }
 
     // Events
-    document.getElementById('login-btn').addEventListener('click', function() {
+    document.getElementById('login-btn').addEventListener('click', async function() {
       var pw = document.getElementById('login-password').value;
-      if (login(pw)) {
-        document.getElementById('login-error').style.display = 'none';
-      } else {
-        document.getElementById('login-error').style.display = 'block';
-      }
+      var ok = await login(pw);
+      if (ok) document.getElementById('login-error').style.display = 'none';
     });
 
     document.getElementById('login-password').addEventListener('keydown', function(e) {
@@ -1013,6 +1105,7 @@
     // Nav
     document.querySelectorAll('.admin__nav-btn').forEach(function(btn) {
       btn.addEventListener('click', function() {
+        touchSession();
         switchSection(btn.getAttribute('data-section'));
       });
     });
@@ -1020,6 +1113,7 @@
     // Add buttons
     document.querySelectorAll('[data-add]').forEach(function(btn) {
       btn.addEventListener('click', function() {
+        touchSession();
         addItem(btn.getAttribute('data-add'));
       });
     });

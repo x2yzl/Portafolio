@@ -6,8 +6,9 @@
 
   var ctx = canvas.getContext('2d');
   var particles = [];
-  var mouse = { x: -9999, y: -9999 };
-  var frameSkip = 0;
+  var mouse = { x: 0, y: 0, tx: 0, ty: 0 };
+  var rotation = { x: 0, y: 0 };
+  var time = 0;
 
   function resize() {
     canvas.width = window.innerWidth;
@@ -18,26 +19,26 @@
   resize();
 
   document.addEventListener('mousemove', function(e) {
-    mouse.x = e.clientX;
-    mouse.y = e.clientY;
-  });
-  document.addEventListener('mouseleave', function() {
-    mouse.x = -9999;
-    mouse.y = -9999;
+    mouse.x = (e.clientX / window.innerWidth - 0.5) * 2;
+    mouse.y = (e.clientY / window.innerHeight - 0.5) * 2;
   });
 
-  var COUNT = 45;
+  var COUNT = 120;
+  var DEPTH = 600;
+  var FOV = 300;
 
   function createParticle() {
     return {
-      x: Math.random() * canvas.width,
-      y: Math.random() * canvas.height,
+      x: (Math.random() - 0.5) * 800,
+      y: (Math.random() - 0.5) * 600,
+      z: (Math.random() - 0.5) * DEPTH,
       vx: (Math.random() - 0.5) * 0.3,
-      vy: (Math.random() - 0.5) * 0.3 - 0.08,
-      size: Math.random() * 2 + 1,
-      alpha: Math.random() * 0.3 + 0.1,
-      pulse: Math.random() * Math.PI * 2,
+      vy: (Math.random() - 0.5) * 0.3,
+      vz: (Math.random() - 0.5) * 0.2,
+      size: Math.random() * 2.5 + 1,
+      alpha: Math.random() * 0.5 + 0.2,
       pulseSpeed: Math.random() * 0.02 + 0.005,
+      pulseOffset: Math.random() * Math.PI * 2,
     };
   }
 
@@ -45,54 +46,81 @@
     particles.push(createParticle());
   }
 
-  function draw() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    frameSkip++;
+  function project(p, rotX, rotY) {
+    var cosY = Math.cos(rotY), sinY = Math.sin(rotY);
+    var cosX = Math.cos(rotX), sinX = Math.sin(rotX);
 
-    var drawLines = frameSkip % 2 === 0;
+    var x1 = p.x * cosY - p.z * sinY;
+    var z1 = p.x * sinY + p.z * cosY;
+    var y1 = p.y * cosX - z1 * sinX;
+    var z2 = p.y * sinX + z1 * cosX;
+
+    if (z2 < 10) z2 = 10;
+    var scale = FOV / (FOV + z2);
+
+    return {
+      sx: x1 * scale + canvas.width / 2,
+      sy: y1 * scale + canvas.height / 2,
+      scale: scale,
+      z: z2,
+    };
+  }
+
+  function draw() {
+    time++;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    mouse.tx += (mouse.x - mouse.tx) * 0.05;
+    mouse.ty += (mouse.y - mouse.ty) * 0.05;
+    rotation.y = mouse.tx * 0.4 + time * 0.0003;
+    rotation.x = mouse.ty * 0.2 + Math.sin(time * 0.001) * 0.05;
 
     for (var i = 0; i < particles.length; i++) {
       var p = particles[i];
-
-      p.pulse += p.pulseSpeed;
       p.x += p.vx;
       p.y += p.vy;
+      p.z += p.vz;
 
-      var dx = p.x - mouse.x;
-      var dy = p.y - mouse.y;
-      var dist = Math.sqrt(dx * dx + dy * dy);
-      if (dist < 100) {
-        var force = (100 - dist) / 100 * 0.5;
-        p.x += dx / dist * force;
-        p.y += dy / dist * force;
-      }
+      var wrap = 500;
+      if (p.x > wrap) p.x = -wrap;
+      if (p.x < -wrap) p.x = wrap;
+      if (p.y > wrap / 1.5) p.y = -wrap / 1.5;
+      if (p.y < -wrap / 1.5) p.y = wrap / 1.5;
+      if (p.z > DEPTH / 2) p.z = -DEPTH / 2;
+      if (p.z < -DEPTH / 2) p.z = DEPTH / 2;
 
-      if (p.x < -10) p.x = canvas.width + 10;
-      if (p.x > canvas.width + 10) p.x = -10;
-      if (p.y < -10) p.y = canvas.height + 10;
-      if (p.y > canvas.height + 10) p.y = -10;
+      var proj = project(p, rotation.x, rotation.y);
+      var a = p.alpha + Math.sin(p.pulseOffset + time * p.pulseSpeed) * 0.12;
+      var s = p.size * proj.scale;
 
-      var alpha = p.alpha + Math.sin(p.pulse) * 0.08;
       ctx.beginPath();
-      ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-      ctx.fillStyle = 'rgba(92, 16, 16, ' + Math.max(0, alpha) + ')';
+      ctx.arc(proj.sx, proj.sy, s, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(92, 16, 16, ' + Math.max(0.1, a) + ')';
       ctx.fill();
+    }
 
-      if (drawLines) {
-        for (var j = i + 1; j < particles.length; j++) {
-          var p2 = particles[j];
-          var dx2 = p.x - p2.x;
-          var dy2 = p.y - p2.y;
-          var d2 = dx2 * dx2 + dy2 * dy2;
-          if (d2 < 10000) {
-            var lineAlpha = (1 - Math.sqrt(d2) / 100) * 0.12;
-            ctx.beginPath();
-            ctx.moveTo(p.x, p.y);
-            ctx.lineTo(p2.x, p2.y);
-            ctx.strokeStyle = 'rgba(61, 12, 12, ' + lineAlpha + ')';
-            ctx.lineWidth = 0.5;
-            ctx.stroke();
-          }
+    ctx.strokeStyle = 'rgba(61, 12, 12, 0.06)';
+    ctx.lineWidth = 0.5;
+
+    for (var i = 0; i < particles.length; i++) {
+      var p1 = particles[i];
+      var proj1 = project(p1, rotation.x, rotation.y);
+
+      for (var j = i + 1; j < particles.length; j += 3) {
+        var p2 = particles[j];
+        var dx = p1.x - p2.x;
+        var dy = p1.y - p2.y;
+        var dz = p1.z - p2.z;
+        var dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
+
+        if (dist < 150) {
+          var proj2 = project(p2, rotation.x, rotation.y);
+          var lineAlpha = (1 - dist / 150) * 0.2;
+          ctx.beginPath();
+          ctx.moveTo(proj1.sx, proj1.sy);
+          ctx.lineTo(proj2.sx, proj2.sy);
+          ctx.strokeStyle = 'rgba(61, 12, 12, ' + lineAlpha + ')';
+          ctx.stroke();
         }
       }
     }

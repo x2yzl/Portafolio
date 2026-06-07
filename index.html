@@ -3,8 +3,20 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Portafolio full-stack">
+  <meta name="description" content="x2yzl — Full Stack Senior. Transformo ideas en aplicaciones y sitios web funcionales que realmente aportan valor.">
   <meta name="theme-color" content="#050505">
+  <meta name="keywords" content="full stack, developer, web, react, node.js, typescript, portfolio">
+  <meta name="author" content="x2yzl">
+  <meta property="og:title" content="x2yzl | Full Stack Senior">
+  <meta property="og:description" content="Full Stack Senior — Transformo ideas en aplicaciones y sitios web funcionales.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://x2yzl.dev">
+  <meta property="og:image" content="assets/images/og-image.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="x2yzl | Full Stack Senior">
+  <meta name="twitter:description" content="Full Stack Senior — Transformo ideas en aplicaciones y sitios web funcionales.">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com https://unpkg.com 'unsafe-inline'; style-src 'self' https://fonts.googleapis.com https://cdnjs.cloudflare.com 'unsafe-inline'; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://*.supabase.co; frame-src 'none'; object-src 'none'; base-uri 'none';">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='4' fill='%23050505'/%3E%3Ctext x='16' y='23' font-size='20' text-anchor='middle' fill='%233d0c0c' font-family='serif' font-weight='bold'%3Ex%3C/text%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Cinzel:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -15,6 +27,7 @@
 
   <div class="cursor-dot" aria-hidden="true"></div>
   <div class="cursor-ring" aria-hidden="true"></div>
+  <div class="scroll-progress" id="scroll-progress" aria-hidden="true"></div>
 
   <div class="loader" id="loader" role="status" aria-label="Cargando">
     <div class="loader__glow" aria-hidden="true"></div>
@@ -62,6 +75,7 @@
       <ul class="navbar__links">
         <li><a href="#about" data-i18n="nav.about">about</a></li>
         <li><a href="#skills" data-i18n="nav.skills">skills</a></li>
+        <li><a href="#experience" data-i18n="nav.experience">experience</a></li>
         <li><a href="#projects" data-i18n="nav.projects">projects</a></li>
         <li><a href="#contact" class="navbar__cta" data-i18n="nav.contact">contact</a></li>
       </ul>
@@ -101,6 +115,8 @@
       </div>
     </section>
 
+    <div class="marquee-wrap" aria-hidden="true"><div class="marquee-inner"></div><div class="marquee-glow"></div></div>
+
     <section id="about" class="section about">
       <div class="section__inner">
         <div class="about__grid">
@@ -137,6 +153,49 @@
       </div>
     </section>
 
+    <section id="experience" class="section experience">
+      <div class="section__inner">
+        <h2 class="section__title" data-i18n="experience.title">[ experience ]</h2>
+        <div class="experience__grid" id="experience-grid">
+          <div class="experience__item" data-anim="fade-up">
+            <div class="experience__meta">
+              <span class="experience__date">2024 — Presente</span>
+              <span class="experience__dot" aria-hidden="true"></span>
+            </div>
+            <div class="experience__card">
+              <h3 class="experience__role">Full Stack Senior</h3>
+              <p class="experience__company">—</p>
+              <p class="experience__desc" data-i18n="experience.job1.desc">Desarrollando aplicaciones web full-stack con tecnologías modernas.</p>
+              <div class="experience__tags">
+                <span class="experience__tag">React</span>
+                <span class="experience__tag">Node.js</span>
+                <span class="experience__tag">TypeScript</span>
+              </div>
+            </div>
+          </div>
+          <div class="experience__item" data-anim="fade-up">
+            <div class="experience__meta">
+              <span class="experience__date">2021 — 2024</span>
+              <span class="experience__dot" aria-hidden="true"></span>
+            </div>
+            <div class="experience__card">
+              <h3 class="experience__role">Software Engineer</h3>
+              <p class="experience__company">—</p>
+              <p class="experience__desc" data-i18n="experience.job2.desc">Creando sistemas escalables y arquitecturas robustas.</p>
+              <div class="experience__tags">
+                <span class="experience__tag">Python</span>
+                <span class="experience__tag">AWS</span>
+                <span class="experience__tag">Docker</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="experience__cv" data-anim="fade-up">
+          <a href="#" class="btn btn--primary" data-i18n="experience.cv_btn">[ descargar CV ]</a>
+        </div>
+      </div>
+    </section>
+
     <section id="projects" class="section projects">
       <div class="section__inner">
         <h2 class="section__title" data-i18n="projects.title">[ projects ]</h2>
@@ -165,6 +224,27 @@
             <span class="contact__card-value">x2yzl</span>
           </a>
         </div>
+
+        <form class="contact__form" id="contact-form" novalidate>
+          <div class="contact__form-grid">
+            <div class="contact__field">
+              <input type="text" id="contact-name" class="contact__input" placeholder=" " required>
+              <label for="contact-name" class="contact__label" data-i18n="contact.form.name">nombre</label>
+            </div>
+            <div class="contact__field">
+              <input type="email" id="contact-email" class="contact__input" placeholder=" " required>
+              <label for="contact-email" class="contact__label" data-i18n="contact.form.email">email</label>
+            </div>
+          </div>
+          <div class="contact__field">
+            <textarea id="contact-message" class="contact__input contact__textarea" placeholder=" " required></textarea>
+            <label for="contact-message" class="contact__label" data-i18n="contact.form.message">mensaje</label>
+          </div>
+          <button type="submit" class="btn btn--primary contact__submit" data-i18n="contact.form.send">
+            [ enviar mensaje ]
+          </button>
+          <p class="contact__form-status" id="contact-status"></p>
+        </form>
       </div>
     </section>
   </main>
@@ -177,6 +257,8 @@
     </div>
   </div>
 
+  <button class="back-to-top" id="back-to-top" aria-label="Volver arriba">↑</button>
+
   <footer class="footer">
     <div class="footer__inner">
       <p>&copy; 2026 x2yzl — <span data-i18n="footer">built with</span> █
@@ -188,13 +270,19 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollToPlugin.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/TextPlugin.min.js"></script>
+  <script src="https://unpkg.com/lenis@1.1.20/dist/lenis.min.js"></script>
   <script src="js/modules/smoke.js"></script>
   <script src="js/modules/particles.js"></script>
+  <script src="js/modules/smoothscroll.js"></script>
   <script src="js/modules/cursor.js"></script>
+  <script src="js/modules/magnet.js"></script>
+  <script src="js/modules/marquee.js"></script>
   <script src="js/modules/navigation.js"></script>
   <script src="js/modules/db.js"></script>
   <script src="js/modules/animations.js"></script>
   <script src="js/modules/i18n.js"></script>
+  <script src="js/modules/textreveals.js"></script>
+  <script src="js/modules/contact.js"></script>
   <script src="js/main.js"></script>
   <script>
     window.addEventListener('load', function() {
@@ -211,12 +299,23 @@
 
       var tl = gsap.timeline({
         onComplete: function() {
-          loader.classList.add('loader--hidden');
-          setTimeout(function() { loader.remove(); }, 1000);
+          var reveal = gsap.timeline({
+            onComplete: function() {
+              loader.remove();
+            }
+          });
+          reveal.to(loader, {
+            clipPath: 'circle(0% at 50% 50%)',
+            duration: 0.8,
+            ease: 'power4.inOut',
+          });
+          reveal.to(loader, { opacity: 0, duration: 0.3 }, '-=0.6');
+          if (typeof ScrollTrigger !== 'undefined') ScrollTrigger.refresh();
         }
       });
 
-      tl.to(glow, { opacity: 1, scale: 1.2, duration: 0.8, ease: 'power2.out' })
+      tl.set(loader, { clipPath: 'circle(150% at 50% 50%)' })
+        .to(glow, { opacity: 1, scale: 1.2, duration: 0.8, ease: 'power2.out' })
         .to(chars, {
           opacity: 1, filter: 'blur(0px)', y: 0, rotate: 0,
           duration: 0.55, stagger: 0.12, ease: 'power3.out'

@@ -1,7 +1,22 @@
 ;(function() {
   'use strict';
 
+  function showSkeletons() {
+    var skillsGrid = document.getElementById('skills-grid');
+    var projectsGrid = document.getElementById('projects-grid');
+
+    if (skillsGrid && !skillsGrid.querySelector('.skills__item')) {
+      skillsGrid.innerHTML = '<div class="skeleton skeleton--skill"></div><div class="skeleton skeleton--skill"></div><div class="skeleton skeleton--skill"></div><div class="skeleton skeleton--skill"></div><div class="skeleton skeleton--skill"></div><div class="skeleton skeleton--skill"></div>';
+    }
+
+    if (projectsGrid && !projectsGrid.querySelector('.project-card')) {
+      projectsGrid.innerHTML = '<div class="skeleton skeleton--project"></div><div class="skeleton skeleton--project"></div>';
+    }
+  }
+
   function loadData() {
+    showSkeletons();
+
     Promise.all([
       db.getSkills(),
       db.getProjects(),

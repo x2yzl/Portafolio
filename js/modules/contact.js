@@ -1,55 +1,78 @@
 ;(function() {
   'use strict';
 
-  const form = document.getElementById('contact-form');
+  var form = document.getElementById('contact-form');
   if (!form) return;
 
-  const loader = form.querySelector('.btn__loader');
-  const submitBtn = form.querySelector('button[type="submit"]');
+  var statusEl = document.getElementById('contact-status');
+  var submitBtn = form.querySelector('.contact__submit');
+  var COOLDOWN_KEY = 'contact_last_submit';
+  var SUBMIT_COOLDOWN = 60000;
+
+  function _(key) {
+    return typeof window.__ === 'function' ? window.__(key) : key;
+  }
 
   form.addEventListener('submit', async function(e) {
     e.preventDefault();
 
-    const name = form.querySelector('#name').value.trim();
-    const email = form.querySelector('#email').value.trim();
-    const message = form.querySelector('#message').value.trim();
+    var name = document.getElementById('contact-name').value.trim();
+    var email = document.getElementById('contact-email').value.trim();
+    var message = document.getElementById('contact-message').value.trim();
 
     if (!name || !email || !message) {
-      const firstEmpty = form.querySelector('#name');
-      if (!name) firstEmpty.focus();
-      else if (!email) form.querySelector('#email').focus();
-      else form.querySelector('#message').focus();
+      setStatus(_('contact.form.name') + ', ' + _('contact.form.email') + ', ' + _('contact.form.message') + ': ' + _('contact.form.send'), 'error');
       return;
     }
 
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      form.querySelector('#email').focus();
+      setStatus('Email inv\u00e1lido', 'error');
       return;
     }
 
-    // Show loader
-    if (loader) loader.hidden = false;
+    var lastSubmit = parseInt(localStorage.getItem(COOLDOWN_KEY) || '0', 10);
+    if (Date.now() - lastSubmit < SUBMIT_COOLDOWN) {
+      setStatus('Espera un momento antes de enviar otro mensaje.', 'error');
+      return;
+    }
+
     submitBtn.disabled = true;
-    submitBtn.querySelector('span:not(.btn__loader)').textContent = 'Enviando...';
+    submitBtn.textContent = _('contact.form.send').replace(/[\[\]]/g, '').trim() + '...';
+    setStatus('', '');
 
     try {
-      // Replace with your Formspree/EmailJS endpoint
-      const response = await fetch('https://formspree.io/f/your-form-id', {
+      var response = await fetch('https://armpwaiwsulmjnlvgkwi.supabase.co/rest/v1/messages', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, message }),
+        headers: {
+          'apikey': 'sb_publishable_OP6ZKev-oWto07FQPyub5g_YXo77r_I',
+          'Authorization': 'Bearer sb_publishable_OP6ZKev-oWto07FQPyub5g_YXo77r_I',
+          'Content-Type': 'application/json',
+          'Prefer': 'return=minimal',
+        },
+        body: JSON.stringify({
+          name: name.replace(/<[^>]*>/g, '').trim(),
+          email: email.replace(/<[^>]*>/g, '').trim(),
+          message: message.replace(/<[^>]*>/g, '').trim(),
+          created_at: new Date().toISOString(),
+        }),
       });
 
-      if (response.ok) {
-        form.innerHTML = '<div class="contact__success"><p>Mensaje enviado con éxito. Gracias por contactarme.</p></div>';
+      if (response.ok || response.status === 201) {
+        localStorage.setItem(COOLDOWN_KEY, Date.now().toString());
+        form.innerHTML = '<div class="contact__success"><span class="contact__success-icon">&#9670;</span><p>' + _('contact.form.success') + '</p></div>';
       } else {
-        throw new Error('Error al enviar');
+        throw new Error('Supabase error');
       }
     } catch (err) {
-      if (loader) loader.hidden = true;
       submitBtn.disabled = false;
-      submitBtn.querySelector('span:not(.btn__loader)').textContent = 'Enviar mensaje';
-      alert('Hubo un error al enviar el mensaje. Intenta de nuevo.');
+      submitBtn.textContent = _('contact.form.send');
+      setStatus('Error. Intenta de nuevo.', 'error');
     }
   });
+
+  function setStatus(msg, type) {
+    if (!statusEl) return;
+    statusEl.textContent = msg;
+    statusEl.className = 'contact__form-status' + (type ? ' contact__form-status--' + type : '');
+  }
 })();

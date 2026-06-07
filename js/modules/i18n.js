@@ -5,7 +5,7 @@
 
   var translations = {
     es: {
-      nav: { about: 'about', skills: 'skills', projects: 'projects', contact: 'contact' },
+      nav: { about: 'about', skills: 'skills', experience: 'experience', projects: 'projects', contact: 'contact' },
       hero: {
         greeting: '❮ hola, soy',
         description: 'Transformo ideas en aplicaciones y sitios web funcionales que realmente aportan valor.',
@@ -26,18 +26,31 @@
         filters: { all: '[ all ]', frontend: '[ frontend ]', backend: '[ backend ]', devops: '[ devops ]' },
       },
       projects: { title: '[ projects ]' },
+      experience: {
+        title: '[ experience ]',
+        job1: { desc: 'Desarrollando aplicaciones web full-stack con tecnologías modernas.' },
+        job2: { desc: 'Creando sistemas escalables y arquitecturas robustas.' },
+        cv_btn: '[ descargar CV ]',
+      },
       contact: {
         title: '[ contact ]',
         lead: 'Trabajemos juntos en tu próximo proyecto.',
         email_label: 'email',
         github_label: 'github',
         discord_label: 'discord',
+        form: {
+          name: 'nombre',
+          email: 'email',
+          message: 'mensaje',
+          send: '[ enviar mensaje ]',
+          success: 'Mensaje enviado con éxito. Gracias.',
+        },
       },
       footer: 'built with',
       loader: { tagline: '— Full Stack Senior —' },
     },
     en: {
-      nav: { about: 'about', skills: 'skills', projects: 'projects', contact: 'contact' },
+      nav: { about: 'about', skills: 'skills', experience: 'experience', projects: 'projects', contact: 'contact' },
       hero: {
         greeting: '❮ hi, i\'m',
         description: 'I turn ideas into functional apps and websites that actually deliver value.',
@@ -58,12 +71,25 @@
         filters: { all: '[ all ]', frontend: '[ frontend ]', backend: '[ backend ]', devops: '[ devops ]' },
       },
       projects: { title: '[ projects ]' },
+      experience: {
+        title: '[ experience ]',
+        job1: { desc: 'Building full-stack web applications with modern technologies.' },
+        job2: { desc: 'Creating scalable systems and robust architectures.' },
+        cv_btn: '[ download CV ]',
+      },
       contact: {
         title: '[ contact ]',
         lead: 'Let\'s work together on your next project.',
         email_label: 'email',
         github_label: 'github',
         discord_label: 'discord',
+        form: {
+          name: 'name',
+          email: 'email',
+          message: 'message',
+          send: '[ send message ]',
+          success: 'Message sent successfully. Thanks!',
+        },
       },
       footer: 'built with',
       loader: { tagline: '— Full Stack Senior —' },
@@ -74,10 +100,21 @@
     return localStorage.getItem(LANG_KEY) || 'es';
   }
 
+  function t(path) {
+    var lang = getLang();
+    var parts = path.split('.');
+    var obj = translations[lang];
+    for (var i = 0; i < parts.length && obj; i++) { obj = obj[parts[i]]; }
+    return obj || path;
+  }
+
   function setLang(lang) {
     localStorage.setItem(LANG_KEY, lang);
     applyLang(lang);
+    document.dispatchEvent(new CustomEvent('languageChanged'));
   }
+
+  window.__ = t;
 
   function applyLang(lang) {
     var t = translations[lang];
@@ -86,6 +123,7 @@
     // Nav
     document.querySelectorAll('[data-i18n="nav.about"]').forEach(function(el) { el.textContent = t.nav.about; });
     document.querySelectorAll('[data-i18n="nav.skills"]').forEach(function(el) { el.textContent = t.nav.skills; });
+    document.querySelectorAll('[data-i18n="nav.experience"]').forEach(function(el) { el.textContent = t.nav.experience; });
     document.querySelectorAll('[data-i18n="nav.projects"]').forEach(function(el) { el.textContent = t.nav.projects; });
     document.querySelectorAll('[data-i18n="nav.contact"]').forEach(function(el) { el.textContent = t.nav.contact; });
 
@@ -120,6 +158,13 @@
     document.querySelectorAll('[data-i18n="contact.email_label"]').forEach(function(el) { el.textContent = t.contact.email_label; });
     document.querySelectorAll('[data-i18n="contact.github_label"]').forEach(function(el) { el.textContent = t.contact.github_label; });
     document.querySelectorAll('[data-i18n="contact.discord_label"]').forEach(function(el) { el.textContent = t.contact.discord_label; });
+
+    // Contact form
+    document.querySelectorAll('[data-i18n="contact.form.name"]').forEach(function(el) { el.textContent = t.contact.form.name; });
+    document.querySelectorAll('[data-i18n="contact.form.email"]').forEach(function(el) { el.textContent = t.contact.form.email; });
+    document.querySelectorAll('[data-i18n="contact.form.message"]').forEach(function(el) { el.textContent = t.contact.form.message; });
+    document.querySelectorAll('[data-i18n="contact.form.send"]').forEach(function(el) { el.textContent = t.contact.form.send; });
+    document.querySelectorAll('[data-i18n="contact.form.success"]').forEach(function(el) { el.textContent = t.contact.form.success; });
 
     // Footer
     document.querySelectorAll('[data-i18n="footer"]').forEach(function(el) { el.textContent = t.footer; });
